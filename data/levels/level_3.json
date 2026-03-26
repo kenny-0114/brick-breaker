@@ -1,17 +1,18 @@
 {
   "ball_speed": 440,
   "initial_balls": 50,
-  "star_thresholds": [16, 11, 7],
+  "star_thresholds": [14, 10, 6],
   "bricks": [
-    {"row": 0, "col": 0, "hp": 70}, {"row": 0, "col": 1, "hp": 85}, {"row": 0, "col": 2, "hp": 100}, {"row": 0, "col": 3, "hp": -1}, {"row": 0, "col": 4, "hp": 100}, {"row": 0, "col": 5, "hp": 85}, {"row": 0, "col": 6, "hp": 70},
-    {"row": 1, "col": 0, "hp": 40}, {"row": 1, "col": 1, "hp": 55}, {"row": 1, "col": 2, "hp": 65}, {"row": 1, "col": 3, "hp": 75}, {"row": 1, "col": 4, "hp": 65}, {"row": 1, "col": 5, "hp": 55}, {"row": 1, "col": 6, "hp": 40},
-    {"row": 2, "col": 0, "hp": 25}, {"row": 2, "col": 1, "hp": -1}, {"row": 2, "col": 2, "hp": 40}, {"row": 2, "col": 3, "hp": 50}, {"row": 2, "col": 4, "hp": 40}, {"row": 2, "col": 5, "hp": -1}, {"row": 2, "col": 6, "hp": 25},
-    {"row": 3, "col": 0, "hp": 15}, {"row": 3, "col": 1, "hp": 20}, {"row": 3, "col": 2, "hp": 25}, {"row": 3, "col": 3, "hp": 30}, {"row": 3, "col": 4, "hp": 25}, {"row": 3, "col": 5, "hp": 20}, {"row": 3, "col": 6, "hp": 15}
+    {"row": 0, "col": 0, "hp": 35}, {"row": 0, "col": 1, "hp": 45}, {"row": 0, "col": 2, "hp": 55}, {"row": 0, "col": 3, "hp": 60}, {"row": 0, "col": 4, "hp": 55}, {"row": 0, "col": 5, "hp": 45}, {"row": 0, "col": 6, "hp": 35},
+    {"row": 1, "col": 1, "hp": 35}, {"row": 1, "col": 2, "hp": 45}, {"row": 1, "col": 3, "hp": 50}, {"row": 1, "col": 4, "hp": 45}, {"row": 1, "col": 5, "hp": 35},
+    {"row": 2, "col": 2, "hp": 30}, {"row": 2, "col": 3, "hp": 40}, {"row": 2, "col": 4, "hp": 30},
+    {"row": 3, "col": 3, "hp": 50},
+    {"row": 4, "col": 1, "hp": -1}, {"row": 4, "col": 5, "hp": -1}
   ],
   "ball_items": [
-    {"row": 0, "col": 1}, {"row": 0, "col": 5},
-    {"row": 1, "col": 0}, {"row": 1, "col": 3}, {"row": 1, "col": 6},
-    {"row": 2, "col": 1}, {"row": 2, "col": 3}, {"row": 2, "col": 5},
-    {"row": 3, "col": 0}, {"row": 3, "col": 3}, {"row": 3, "col": 6}
+    {"row": 1, "col": 0}, {"row": 1, "col": 6},
+    {"row": 2, "col": 0}, {"row": 2, "col": 1}, {"row": 2, "col": 5}, {"row": 2, "col": 6},
+    {"row": 3, "col": 1}, {"row": 3, "col": 5},
+    {"row": 4, "col": 3}
   ]
 }
