@@ -64,6 +64,8 @@ position = Vector2(490, 427)
 shape = SubResource("wall_v")
 
 [node name="Floor" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
 position = Vector2(240, 820)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]

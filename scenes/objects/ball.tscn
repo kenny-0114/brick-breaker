@@ -11,6 +11,8 @@ friction = 0.0
 radius = 7.0
 
 [node name="Ball" type="RigidBody2D" groups=["ball"]]
+collision_layer = 2
+collision_mask = 1
 physics_material_override = SubResource("SubResource_phys")
 gravity_scale = 0.0
 contact_monitor = true
