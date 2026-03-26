@@ -48,16 +48,16 @@ func save_data() -> void:
 	file.store_string(JSON.stringify(data, "\t"))
 
 
-# 스테이지 클리어 시 결과를 반영한다.
-func complete_stage(level: int, score: int, stars_earned: int) -> void:
+# 스테이지 클리어 시 결과를 반영한다. score는 턴 수 (낮을수록 좋음).
+func complete_stage(level: int, turn_count: int, stars_earned: int) -> void:
 	var level_key := str(level)
 	# 해금 레벨 갱신
 	if level + 1 > data["unlocked_level"]:
 		data["unlocked_level"] = level + 1
-	# 최고 점수 갱신
-	var current_high: int = int(data["high_scores"].get(level_key, 0))
-	if score > current_high:
-		data["high_scores"][level_key] = score
+	# 최저 턴 기록 갱신 (낮을수록 좋음, 0은 미플레이 의미)
+	var current_best: int = int(data["high_scores"].get(level_key, 0))
+	if current_best == 0 or turn_count < current_best:
+		data["high_scores"][level_key] = turn_count
 	# 별 갱신
 	var current_stars: int = int(data["stars"].get(level_key, 0))
 	if stars_earned > current_stars:
