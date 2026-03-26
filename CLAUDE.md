@@ -72,7 +72,7 @@ Floor(Area2D)와 BallItem(Area2D)은 `collision_mask=2`로 공만 감지.
 
 ## Code Conventions
 
-- 모든 주석과 응답은 **한국어**
+- 모든 주석, 응답, **git 커밋 메시지**는 **한국어**로 작성
 - Private: `_snake_case`, Constants: `UPPER_SNAKE_CASE`, Signals: `snake_case`
 - Boolean: `is_`, `has_`, `can_` 접두사
 - 함수 상단에 목적 주석 필수
