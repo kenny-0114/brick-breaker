@@ -5,7 +5,7 @@ extends CanvasLayer
 @onready var score_label: Label = $MarginContainer/HBoxContainer/ScoreLabel
 @onready var level_label: Label = $MarginContainer/HBoxContainer/LevelLabel
 @onready var lives_label: Label = $MarginContainer/HBoxContainer/LivesLabel
-@onready var pause_button: TextureButton = $MarginContainer/HBoxContainer/PauseButton
+@onready var pause_button: Button = $MarginContainer/HBoxContainer/PauseButton
 
 
 func _ready() -> void:
@@ -31,6 +31,6 @@ func _update_level() -> void:
 
 # 일시정지 버튼을 눌렀을 때 PauseMenu를 토글한다.
 func _on_pause_pressed() -> void:
-	var pause_menu := get_parent().get_node("PauseMenu")
+	var pause_menu: Node = get_parent().get_node("PauseMenu")
 	if pause_menu:
 		pause_menu.toggle_pause()

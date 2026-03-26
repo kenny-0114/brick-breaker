@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="Brick-Breaker"
+run/main_scene="res://scenes/title_screen.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
-run/main_scene="res://scenes/title_screen.tscn"
 
 [autoload]
 
@@ -26,7 +26,6 @@ SoundManager="*res://scripts/autoload/sound_manager.gd"
 window/size/viewport_width=480
 window/size/viewport_height=854
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
 window/handheld/orientation=1
 
 [input_devices]

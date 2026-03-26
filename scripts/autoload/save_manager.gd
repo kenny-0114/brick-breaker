@@ -55,11 +55,11 @@ func complete_stage(level: int, score: int, stars_earned: int) -> void:
 	if level + 1 > data["unlocked_level"]:
 		data["unlocked_level"] = level + 1
 	# 최고 점수 갱신
-	var current_high: int = data["high_scores"].get(level_key, 0)
+	var current_high: int = int(data["high_scores"].get(level_key, 0))
 	if score > current_high:
 		data["high_scores"][level_key] = score
 	# 별 갱신
-	var current_stars: int = data["stars"].get(level_key, 0)
+	var current_stars: int = int(data["stars"].get(level_key, 0))
 	if stars_earned > current_stars:
 		data["stars"][level_key] = stars_earned
 	save_data()

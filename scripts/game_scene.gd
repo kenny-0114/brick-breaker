@@ -5,15 +5,23 @@ extends Node2D
 const BRICK_SCENE := preload("res://scenes/objects/brick.tscn")
 const BALL_SCENE := preload("res://scenes/objects/ball.tscn")
 const POWERUP_SCENE := preload("res://scenes/objects/power_up.tscn")
-const PARTICLE_TEXTURE := preload("res://assets/images/particles/particleWhite_1.png")
+const BRICK_TEXTURES := {
+	1: preload("res://assets/images/bricks/tileGreen_14.png"),
+	2: preload("res://assets/images/bricks/tileOrange_14.png"),
+	3: preload("res://assets/images/bricks/tileRed_14.png"),
+}
+# 파티클용 정사각형 벽돌 조각 이미지
+const DEBRIS_TEXTURES := {
+	1: preload("res://assets/images/bricks/tileGreen_01.png"),
+	2: preload("res://assets/images/bricks/tileOrange_27.png"),
+	3: preload("res://assets/images/bricks/tileRed_01.png"),
+}
 
 const GRID_COLS := 7
 const BRICK_MARGIN := 4.0
 const GRID_TOP_OFFSET := 80.0
 const POWERUP_DROP_CHANCE := 0.2
 
-# 파티클용 공유 머티리얼 (매번 생성하지 않고 재사용)
-static var _particle_material: ParticleProcessMaterial
 
 var _ball_speed := 300.0
 var _remaining_bricks := 0
@@ -29,15 +37,6 @@ var _remaining_bricks := 0
 
 
 func _ready() -> void:
-	if _particle_material == null:
-		_particle_material = ParticleProcessMaterial.new()
-		_particle_material.direction = Vector3(0, -1, 0)
-		_particle_material.spread = 180.0
-		_particle_material.initial_velocity_min = 50.0
-		_particle_material.initial_velocity_max = 150.0
-		_particle_material.gravity = Vector3(0, 200, 0)
-		_particle_material.scale_min = 0.5
-		_particle_material.scale_max = 1.0
 	GameManager.game_over.connect(_on_game_over)
 	GameManager.stage_cleared.connect(_on_stage_cleared)
 	_load_level(GameManager.current_level)
@@ -72,7 +71,7 @@ func _load_level(level: int) -> void:
 	var viewport_width := get_viewport_rect().size.x
 	var brick_width := (viewport_width - BRICK_MARGIN * (GRID_COLS + 1)) / GRID_COLS
 
-	var bricks_array: Array = data.get("bricks", [])
+	var bricks_array: Array = data.get("bricks", []) as Array
 	for brick_data: Dictionary in bricks_array:
 		var brick: StaticBody2D = BRICK_SCENE.instantiate()
 		var row: int = brick_data["row"]
@@ -105,23 +104,37 @@ func _launch_all_balls() -> void:
 func _on_brick_destroyed(pos: Vector2, hp: int) -> void:
 	GameManager.add_brick_score(hp)
 	_remaining_bricks -= 1
-	_spawn_particles(pos)
+	_spawn_particles(pos, hp)
 	if randf() < POWERUP_DROP_CHANCE:
 		_spawn_powerup(pos)
 	if _remaining_bricks <= 0:
 		GameManager.clear_stage()
 
 
-# 파괴 파티클을 생성한다. 공유 머티리얼을 재사용한다.
-func _spawn_particles(pos: Vector2) -> void:
+# 벽돌 조각이 흩어지는 파티클. 정사각형 벽돌 이미지를 텍스처로 사용한다.
+func _spawn_particles(pos: Vector2, hp: int) -> void:
+	var tex: Texture2D = DEBRIS_TEXTURES.get(hp, DEBRIS_TEXTURES[1]) as Texture2D
+	var mat := ParticleProcessMaterial.new()
+	mat.direction = Vector3(0, 1, 0)
+	mat.spread = 120.0
+	mat.initial_velocity_min = 40.0
+	mat.initial_velocity_max = 120.0
+	mat.gravity = Vector3(0, 300, 0)
+	mat.scale_min = 0.06
+	mat.scale_max = 0.12
+	mat.angular_velocity_min = -200.0
+	mat.angular_velocity_max = 200.0
+	# 벽돌 너비만큼 넓은 영역에서 파티클 생성
+	mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	mat.emission_box_extents = Vector3(25, 8, 0)
 	var particles := GPUParticles2D.new()
 	particles.position = pos
 	particles.emitting = true
 	particles.one_shot = true
-	particles.amount = 8
-	particles.lifetime = 0.4
-	particles.process_material = _particle_material
-	particles.texture = PARTICLE_TEXTURE
+	particles.amount = 6
+	particles.lifetime = 0.6
+	particles.process_material = mat
+	particles.texture = tex
 	add_child(particles)
 	particles.finished.connect(particles.queue_free)
 

@@ -83,6 +83,12 @@ func set_sfx_volume(volume: float) -> void:
 
 # 저장된 볼륨 설정을 적용한다.
 func _apply_saved_volume() -> void:
-	var settings: Dictionary = SaveManager.data.get("settings", {})
-	set_bgm_volume(settings.get("bgm_volume", 1.0))
-	set_sfx_volume(settings.get("sfx_volume", 1.0))
+	var save_mgr: Node = get_node_or_null("/root/SaveManager")
+	if save_mgr == null:
+		return
+	var data: Dictionary = save_mgr.get("data") as Dictionary
+	if data.is_empty():
+		return
+	var settings: Dictionary = data.get("settings", {}) as Dictionary
+	set_bgm_volume(float(settings.get("bgm_volume", 1.0)))
+	set_sfx_volume(float(settings.get("sfx_volume", 1.0)))

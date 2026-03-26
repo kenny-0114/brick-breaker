@@ -9,9 +9,9 @@ extends Control
 
 func _ready() -> void:
 	visible = false
-	var settings: Dictionary = SaveManager.data.get("settings", {})
-	bgm_slider.value = settings.get("bgm_volume", 1.0)
-	sfx_slider.value = settings.get("sfx_volume", 1.0)
+	var settings: Dictionary = SaveManager.data.get("settings", {}) as Dictionary
+	bgm_slider.value = float(settings.get("bgm_volume", 1.0))
+	sfx_slider.value = float(settings.get("sfx_volume", 1.0))
 
 
 # 팝업을 연다.

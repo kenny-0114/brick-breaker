@@ -54,5 +54,7 @@ func clear_stage() -> void:
 	var bonus := lives * SCORE_CLEAR_BONUS_PER_LIFE
 	score += bonus
 	score_changed.emit(score)
-	SaveManager.complete_stage(current_level, score, lives)
+	var save_mgr: Node = get_node_or_null("/root/SaveManager")
+	if save_mgr:
+		save_mgr.call("complete_stage", current_level, score, lives)
 	stage_cleared.emit()

@@ -1,7 +1,7 @@
 {
   "level": 3,
   "lives": 3,
-  "ball_speed": 300,
+  "ball_speed": 470,
   "bricks": [
     {"row": 0, "col": 0, "hp": -1}, {"row": 0, "col": 1, "hp": 3}, {"row": 0, "col": 2, "hp": 3}, {"row": 0, "col": 3, "hp": 3}, {"row": 0, "col": 4, "hp": 3}, {"row": 0, "col": 5, "hp": 3}, {"row": 0, "col": 6, "hp": -1},
     {"row": 1, "col": 0, "hp": 2}, {"row": 1, "col": 1, "hp": 2}, {"row": 1, "col": 2, "hp": 1}, {"row": 1, "col": 3, "hp": 2}, {"row": 1, "col": 4, "hp": 1}, {"row": 1, "col": 5, "hp": 2}, {"row": 1, "col": 6, "hp": 2},
