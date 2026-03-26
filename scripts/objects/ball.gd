@@ -1,6 +1,6 @@
 # scripts/objects/ball.gd
 # 턴제 벽돌깨기의 공. 일정 속도로 직선 이동하고 벽/벽돌에 반사된다.
-# 물리 엔진 반사 대신 충돌 노멀 기반 수동 반사로 결정적 동작을 보장한다.
+# 물리 엔진(bounce=1.0)이 반사를 처리하고, 충돌 후 속도 정규화와 각도 보정만 수행한다.
 extends RigidBody2D
 
 const MIN_ANGLE_RAD := deg_to_rad(15.0)
@@ -47,42 +47,20 @@ func _physics_process(_delta: float) -> void:
 	_update_trail()
 
 
-# 충돌 시 노멀 벡터로 수동 반사를 계산한다.
+# 충돌 후 속도를 정규화하고 극단적 각도를 보정한다.
 func _on_body_entered(body: Node) -> void:
 	if body.has_method("hit"):
 		body.hit()
-	# 충돌 노멀을 구해 반사 방향을 직접 계산한다.
-	var collision_normal := _get_collision_normal(body)
-	if collision_normal == Vector2.ZERO:
-		return
+	# 물리 엔진이 반사한 뒤 다음 프레임에서 속도를 보정한다.
+	_correct_velocity.call_deferred()
+
+
+# 속도 정규화 + 각도 보정을 한 번에 수행한다.
+func _correct_velocity() -> void:
 	var vel := linear_velocity
-	var reflected := vel.bounce(collision_normal)
-	reflected = reflected.normalized() * _target_speed
-	reflected = _clamp_angle(reflected)
-	linear_velocity = reflected
-
-
-# 충돌 대상과의 노멀 벡터를 계산한다.
-func _get_collision_normal(body: Node) -> Vector2:
-	var space_state := get_world_2d().direct_space_state
-	var body_pos: Vector2 = body.get("global_position") as Vector2
-	var dir: Vector2 = (body_pos - global_position).normalized()
-	var query := PhysicsRayQueryParameters2D.create(
-		global_position, global_position + dir * 50.0,
-		collision_mask, [get_rid()]
-	)
-	var result := space_state.intersect_ray(query)
-	if result.is_empty():
-		# Raycast 실패 시 위치 기반 근사 노멀 계산
-		return -(body_pos - global_position).normalized()
-	return result["normal"]
-
-
-# 너무 수평에 가까운 각도를 보정한다.
-func _clamp_angle(vel: Vector2) -> Vector2:
 	var speed := vel.length()
 	if speed < 1.0:
-		return vel
+		return
 	var dir := vel / speed
 	var angle := absf(dir.angle_to(Vector2.UP))
 	if angle < MIN_ANGLE_RAD:
@@ -93,7 +71,7 @@ func _clamp_angle(vel: Vector2) -> Vector2:
 		var sign_y: float = signf(dir.y) if dir.y != 0.0 else -1.0
 		dir.y = abs(dir.x) * tan(MIN_ANGLE_RAD) * sign_y
 		dir = dir.normalized()
-	return dir * _target_speed
+	linear_velocity = dir * _target_speed
 
 
 # 속도에 비례하여 트레일 길이를 조절한다.

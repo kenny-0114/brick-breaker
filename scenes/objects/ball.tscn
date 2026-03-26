@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/images/ball/ballBlue_01.png" id="2_ball"]
 
 [sub_resource type="PhysicsMaterial" id="SubResource_phys"]
-bounce = 0.0
+bounce = 1.0
 friction = 0.0
 
 [sub_resource type="CircleShape2D" id="SubResource_shape"]
