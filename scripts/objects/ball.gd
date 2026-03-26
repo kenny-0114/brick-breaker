@@ -44,6 +44,13 @@ func launch(direction: Vector2) -> void:
 func _physics_process(_delta: float) -> void:
 	if not _is_active:
 		return
+	# 매 프레임 속도를 목표 속도로 유지한다. 물리 충돌로 감속된 공을 복구한다.
+	var speed := linear_velocity.length()
+	if speed > 0.1 and speed != _target_speed:
+		linear_velocity = linear_velocity.normalized() * _target_speed
+	elif speed <= 0.1 and _is_active:
+		# 완전히 멈춘 공을 마지막 방향 또는 아래로 밀어준다.
+		linear_velocity = Vector2(0, 1) * _target_speed
 	_update_trail()
 
 
