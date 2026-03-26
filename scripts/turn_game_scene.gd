@@ -22,6 +22,8 @@ var _balls_collected := 0
 var _first_ball_x := 240.0
 var _first_ball_landed := false
 var _cell_height := 34.0
+var _balls_returned := 0
+var _landing_indicator: Node2D = null
 
 @onready var launcher: Node2D = $Launcher
 @onready var brick_container: Node2D = $BrickContainer
@@ -116,7 +118,9 @@ func _load_level(level: int) -> void:
 func _start_aiming() -> void:
 	_state = State.AIMING
 	_balls_collected = 0
+	_balls_returned = 0
 	_first_ball_landed = false
+	_hide_landing_indicator()
 	launcher.set_launch_x(_first_ball_x)
 	launcher.enable_aiming()
 
@@ -141,6 +145,10 @@ func _on_floor_body_entered(body: Node2D) -> void:
 	if not _first_ball_landed:
 		_first_ball_landed = true
 		_first_ball_x = clampf(body.global_position.x, 20.0, 460.0)
+		_create_landing_indicator()
+	# 회수 카운터 증가 및 표시 갱신
+	_balls_returned += 1
+	_update_landing_indicator()
 	# 공을 발사 지점으로 이동 후 제거
 	var tween := create_tween()
 	body.freeze = true
@@ -244,6 +252,47 @@ func _spawn_particles(pos: Vector2) -> void:
 	particles.texture = preload("res://assets/images/bricks/tileGreen_01.png")
 	add_child(particles)
 	particles.finished.connect(particles.queue_free)
+
+
+# 공 착지 지점에 인디케이터(공 아이콘 + 회수 카운트)를 생성한다.
+func _create_landing_indicator() -> void:
+	_landing_indicator = Node2D.new()
+	_landing_indicator.position = Vector2(_first_ball_x, FLOOR_Y)
+	# 공 아이콘
+	var icon := Sprite2D.new()
+	icon.texture = preload("res://assets/images/ball/ballBlue_01.png")
+	icon.scale = Vector2(0.11, 0.11)
+	icon.position = Vector2(0, -12)
+	_landing_indicator.add_child(icon)
+	# 카운트 라벨
+	var label := Label.new()
+	label.name = "CountLabel"
+	label.text = "x1"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.position = Vector2(-20, -30)
+	label.size = Vector2(40, 20)
+	label.add_theme_font_size_override("font_size", 11)
+	label.add_theme_color_override("font_color", Color(0.5, 0.85, 1.0, 1.0))
+	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	label.add_theme_constant_override("outline_size", 2)
+	_landing_indicator.add_child(label)
+	add_child(_landing_indicator)
+
+
+# 인디케이터의 카운트를 갱신한다.
+func _update_landing_indicator() -> void:
+	if _landing_indicator == null:
+		return
+	var label: Label = _landing_indicator.get_node("CountLabel")
+	if label:
+		label.text = "x%d" % _balls_returned
+
+
+# 인디케이터를 숨기고 제거한다.
+func _hide_landing_indicator() -> void:
+	if _landing_indicator != null:
+		_landing_indicator.queue_free()
+		_landing_indicator = null
 
 
 # 빨리감기를 설정/해제한다.
