@@ -1,12 +1,16 @@
 {
-  "level": 4,
-  "lives": 3,
-  "ball_speed": 520,
+  "ball_speed": 440,
+  "initial_balls": 2,
+  "star_thresholds": [22, 16, 10],
   "bricks": [
-    {"row": 0, "col": 0, "hp": -1}, {"row": 0, "col": 1, "hp": 3}, {"row": 0, "col": 2, "hp": 3}, {"row": 0, "col": 3, "hp": -1}, {"row": 0, "col": 4, "hp": 3}, {"row": 0, "col": 5, "hp": 3}, {"row": 0, "col": 6, "hp": -1},
-    {"row": 1, "col": 0, "hp": 3}, {"row": 1, "col": 1, "hp": 2}, {"row": 1, "col": 2, "hp": 3}, {"row": 1, "col": 3, "hp": 2}, {"row": 1, "col": 4, "hp": 3}, {"row": 1, "col": 5, "hp": 2}, {"row": 1, "col": 6, "hp": 3},
-    {"row": 2, "col": 0, "hp": 2}, {"row": 2, "col": 1, "hp": 2}, {"row": 2, "col": 2, "hp": 2}, {"row": 2, "col": 3, "hp": 2}, {"row": 2, "col": 4, "hp": 2}, {"row": 2, "col": 5, "hp": 2}, {"row": 2, "col": 6, "hp": 2},
-    {"row": 3, "col": 0, "hp": 2}, {"row": 3, "col": 1, "hp": -1}, {"row": 3, "col": 2, "hp": 2}, {"row": 3, "col": 3, "hp": 2}, {"row": 3, "col": 4, "hp": 2}, {"row": 3, "col": 5, "hp": -1}, {"row": 3, "col": 6, "hp": 2},
-    {"row": 4, "col": 1, "hp": 2}, {"row": 4, "col": 2, "hp": 2}, {"row": 4, "col": 3, "hp": 3}, {"row": 4, "col": 4, "hp": 2}, {"row": 4, "col": 5, "hp": 2}
+    {"row": 0, "col": 0, "hp": 12}, {"row": 0, "col": 1, "hp": 15}, {"row": 0, "col": 2, "hp": 12}, {"row": 0, "col": 3, "hp": 20}, {"row": 0, "col": 4, "hp": 12}, {"row": 0, "col": 5, "hp": 15}, {"row": 0, "col": 6, "hp": 12},
+    {"row": 1, "col": 0, "hp": 8}, {"row": 1, "col": 1, "hp": -1}, {"row": 1, "col": 2, "hp": 10}, {"row": 1, "col": 3, "hp": 8}, {"row": 1, "col": 4, "hp": 10}, {"row": 1, "col": 5, "hp": -1}, {"row": 1, "col": 6, "hp": 8},
+    {"row": 2, "col": 0, "hp": 5}, {"row": 2, "col": 1, "hp": 8}, {"row": 2, "col": 2, "hp": 5}, {"row": 2, "col": 3, "hp": 8}, {"row": 2, "col": 4, "hp": 5}, {"row": 2, "col": 5, "hp": 8}, {"row": 2, "col": 6, "hp": 5},
+    {"row": 3, "col": 0, "hp": 3}, {"row": 3, "col": 2, "hp": 5}, {"row": 3, "col": 4, "hp": 5}, {"row": 3, "col": 6, "hp": 3}
+  ],
+  "ball_items": [
+    {"row": 0, "col": 1}, {"row": 0, "col": 5},
+    {"row": 1, "col": 3}, {"row": 2, "col": 1}, {"row": 2, "col": 5},
+    {"row": 3, "col": 1}, {"row": 3, "col": 3}, {"row": 3, "col": 5}
   ]
 }
