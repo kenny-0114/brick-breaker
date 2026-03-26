@@ -7,17 +7,6 @@ enum State { AIMING, FIRING, WAITING, TURN_END }
 const BALL_SCENE := preload("res://scenes/objects/ball.tscn")
 const BRICK_SCENE := preload("res://scenes/objects/brick.tscn")
 const BALL_ITEM_SCENE := preload("res://scenes/objects/ball_item.tscn")
-const BRICK_TEXTURES := {
-	"green": preload("res://assets/images/bricks/tileGreen_14.png"),
-	"orange": preload("res://assets/images/bricks/tileOrange_14.png"),
-	"red": preload("res://assets/images/bricks/tileRed_14.png"),
-}
-const DEBRIS_TEXTURES := {
-	"green": preload("res://assets/images/bricks/tileGreen_01.png"),
-	"orange": preload("res://assets/images/bricks/tileOrange_27.png"),
-	"red": preload("res://assets/images/bricks/tileRed_01.png"),
-}
-
 const GRID_COLS := 7
 const BRICK_MARGIN := 4.0
 const GRID_TOP_OFFSET := 80.0
@@ -31,7 +20,6 @@ var _ball_speed := 400.0
 var _balls_collected := 0
 var _first_ball_x := 240.0
 var _first_ball_landed := false
-var _active_ball_count := 0
 
 @onready var launcher: Node2D = $Launcher
 @onready var brick_container: Node2D = $BrickContainer
@@ -48,6 +36,7 @@ func _ready() -> void:
 	GameManager.stage_cleared.connect(_on_stage_cleared)
 	floor_zone.body_entered.connect(_on_floor_body_entered)
 	launcher.all_balls_fired.connect(_on_all_balls_fired)
+	launcher.aiming_ended.connect(_on_aiming_ended)
 	_load_level(GameManager.current_level)
 	_start_aiming()
 
@@ -118,15 +107,18 @@ func _start_aiming() -> void:
 	_state = State.AIMING
 	_balls_collected = 0
 	_first_ball_landed = false
-	_active_ball_count = 0
 	launcher.set_launch_x(_first_ball_x)
 	launcher.enable_aiming()
+
+
+# 조준 해제 시 발사 상태로 전환한다.
+func _on_aiming_ended() -> void:
+	_state = State.FIRING
 
 
 # Launcher가 모든 공을 발사 완료했을 때 호출된다.
 func _on_all_balls_fired() -> void:
 	_state = State.WAITING
-	_active_ball_count = ball_container.get_child_count()
 
 
 # 공이 바닥에 닿았을 때 호출된다.
@@ -140,7 +132,6 @@ func _on_floor_body_entered(body: Node2D) -> void:
 	# 공을 발사 지점으로 이동 후 제거
 	var tween := create_tween()
 	body.freeze = true
-	body.set_deferred("linear_velocity", Vector2.ZERO)
 	tween.tween_property(body, "global_position", Vector2(_first_ball_x, FLOOR_Y), 0.15)
 	tween.tween_callback(body.queue_free)
 	# 모든 공이 회수되었는지 다음 프레임에서 확인
@@ -185,6 +176,8 @@ func _end_turn() -> void:
 
 # 모든 벽돌을 한 칸 아래로 이동시킨다.
 func _descend_bricks() -> void:
+	if brick_container.get_child_count() == 0 and item_container.get_child_count() == 0:
+		return
 	var tween := create_tween()
 	tween.set_parallel(true)
 	for brick in brick_container.get_children():

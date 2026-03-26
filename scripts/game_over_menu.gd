@@ -25,7 +25,7 @@ func show_game_over() -> void:
 func show_clear() -> void:
 	title_label.text = "STAGE CLEAR!"
 	score_label.text = "Turn: %d" % GameManager.turn_count
-	var stars := GameManager._calculate_stars()
+	var stars := GameManager.calculate_stars()
 	_show_stars(stars)
 	panel.visible = true
 	get_tree().paused = true

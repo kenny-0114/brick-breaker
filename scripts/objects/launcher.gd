@@ -134,6 +134,8 @@ func start_firing(ball_count: int) -> void:
 	_fire_one_ball()
 	if _balls_to_fire > 0:
 		fire_timer.start()
+	else:
+		all_balls_fired.emit()
 
 
 # 공을 하나 생성하여 발사한다.

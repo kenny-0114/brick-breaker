@@ -1,9 +1,7 @@
 # scripts/objects/ball.gd
 # 턴제 벽돌깨기의 공. 일정 속도로 직선 이동하고 벽/벽돌에 반사된다.
-# 바닥 도달 시 회수 시그널을 발생시킨다.
+# 바닥 도달 시 TurnGameScene에서 회수를 처리한다.
 extends RigidBody2D
-
-signal ball_returned(ball_position: Vector2)
 
 const MIN_ANGLE_RAD := deg_to_rad(15.0)
 const MAX_ANGLE_RAD := deg_to_rad(165.0)

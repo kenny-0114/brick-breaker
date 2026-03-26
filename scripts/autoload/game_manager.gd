@@ -40,7 +40,7 @@ func add_balls(count: int) -> void:
 
 # 턴 수 기준으로 별 개수를 계산한다.
 # star_thresholds = [1성 기준, 2성 기준, 3성 기준] (턴 수 이하면 획득)
-func _calculate_stars() -> int:
+func calculate_stars() -> int:
 	if _star_thresholds.is_empty():
 		return 0
 	var stars := 0
@@ -53,7 +53,7 @@ func _calculate_stars() -> int:
 # 스테이지 클리어 시 결과를 저장한다.
 func clear_stage() -> void:
 	is_playing = false
-	var stars := _calculate_stars()
+	var stars := calculate_stars()
 	var save_mgr: Node = get_node_or_null("/root/SaveManager")
 	if save_mgr:
 		save_mgr.call("complete_stage", current_level, turn_count, stars)
