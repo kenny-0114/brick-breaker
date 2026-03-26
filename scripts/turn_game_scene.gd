@@ -13,8 +13,10 @@ const GRID_TOP_OFFSET := 80.0
 const DESCEND_AMOUNT := 36.0
 const DESCEND_DURATION := 0.3
 const FLOOR_Y := 800.0
+const FAST_FORWARD_SPEED := 3.0
 
 var _state: State = State.AIMING
+var _is_fast_forward := false
 var _remaining_bricks := 0
 var _ball_speed := 400.0
 var _balls_collected := 0
@@ -117,8 +119,10 @@ func _on_aiming_ended() -> void:
 
 
 # Launcher가 모든 공을 발사 완료했을 때 호출된다.
+# 발사 완료 시 자동으로 빨리감기를 활성화한다.
 func _on_all_balls_fired() -> void:
 	_state = State.WAITING
+	_set_fast_forward(true)
 
 
 # 공이 바닥에 닿았을 때 호출된다.
@@ -151,6 +155,7 @@ func _check_all_balls_returned() -> void:
 # 턴을 종료한다: 벽돌 하강, 게임오버/클리어 체크, 아이템 정산.
 func _end_turn() -> void:
 	_state = State.TURN_END
+	_set_fast_forward(false)
 	GameManager.advance_turn()
 
 	# 벽돌 하강
@@ -233,9 +238,17 @@ func _spawn_particles(pos: Vector2) -> void:
 	particles.finished.connect(particles.queue_free)
 
 
+# 빨리감기를 설정/해제한다.
+func _set_fast_forward(enabled: bool) -> void:
+	_is_fast_forward = enabled
+	Engine.time_scale = FAST_FORWARD_SPEED if enabled else 1.0
+
+
 func _on_game_over() -> void:
+	_set_fast_forward(false)
 	game_over_menu.show_game_over()
 
 
 func _on_stage_cleared() -> void:
+	_set_fast_forward(false)
 	game_over_menu.show_clear()
