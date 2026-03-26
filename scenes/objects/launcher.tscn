@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/launcher.gd" id="1_launcher"]
+
+[node name="Launcher" type="Node2D"]
+script = ExtResource("1_launcher")
+
+[node name="AimLine" type="Line2D" parent="."]
+width = 2.0
+default_color = Color(1, 1, 1, 0.5)
+
+[node name="LaunchPoint" type="Marker2D" parent="."]
+position = Vector2(0, 0)
+
+[node name="FireTimer" type="Timer" parent="."]
+wait_time = 0.05
+one_shot = false
