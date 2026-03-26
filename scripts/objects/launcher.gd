@@ -1,6 +1,7 @@
 # scripts/objects/launcher.gd
 # 조준선을 표시하고 공을 연사로 발사한다.
 # 터치 드래그로 방향을 조준하고, 터치를 떼면 발사한다.
+# 가이드라인은 공 이미지 점선으로 1회 바운스 경로를 표시한다.
 extends Node2D
 
 signal all_balls_fired
@@ -10,9 +11,10 @@ signal aiming_ended
 const FIRE_INTERVAL := 0.05
 const MIN_AIM_ANGLE := deg_to_rad(10.0)
 const MAX_AIM_ANGLE := deg_to_rad(170.0)
-const AIM_LINE_LENGTH := 1200.0
-const AIM_LINE_DASH := 8.0
-const AIM_LINE_GAP := 6.0
+const DOT_SPACING := 20.0
+const DOT_SCALE := Vector2(0.06, 0.06)
+const MAX_DOTS := 60
+const RAY_LENGTH := 2000.0
 
 var _is_aiming := false
 var _aim_direction := Vector2.UP
@@ -20,17 +22,26 @@ var _balls_to_fire: int = 0
 var _ball_scene: PackedScene = null
 var _ball_speed: float = 400.0
 var _ball_container: Node2D = null
+var _dot_pool: Array[Sprite2D] = []
+var _ball_texture: Texture2D = preload("res://assets/images/ball/ballBlue_01.png")
 
-@onready var aim_line: Line2D = $AimLine
 @onready var launch_point: Marker2D = $LaunchPoint
 @onready var fire_timer: Timer = $FireTimer
 
 
 func _ready() -> void:
-	aim_line.visible = false
 	fire_timer.wait_time = FIRE_INTERVAL
 	fire_timer.one_shot = false
 	fire_timer.timeout.connect(_on_fire_timer_timeout)
+	# 점 스프라이트 풀을 미리 생성한다.
+	for i in MAX_DOTS:
+		var dot := Sprite2D.new()
+		dot.texture = _ball_texture
+		dot.scale = DOT_SCALE
+		dot.visible = false
+		dot.modulate = Color(1, 1, 1, 0.5)
+		add_child(dot)
+		_dot_pool.append(dot)
 
 
 # 발사에 필요한 참조를 설정한다.
@@ -54,7 +65,7 @@ func enable_aiming() -> void:
 # 조준 입력을 비활성화한다.
 func disable_aiming() -> void:
 	_is_aiming = false
-	aim_line.visible = false
+	_hide_dots()
 	set_process_input(false)
 
 
@@ -98,23 +109,68 @@ func _update_aim(touch_pos: Vector2) -> void:
 		var clamped := signf(angle) * MAX_AIM_ANGLE * 0.5
 		raw_dir = Vector2.UP.rotated(clamped)
 	_aim_direction = raw_dir
-	_draw_aim_line(launch_global)
+	_draw_dotted_guide(launch_global)
 
 
-# 점선 조준선을 그린다.
-func _draw_aim_line(from: Vector2) -> void:
-	aim_line.clear_points()
-	aim_line.visible = true
-	var step := AIM_LINE_DASH + AIM_LINE_GAP
-	var total := AIM_LINE_LENGTH
-	var pos := from
-	var drawn := 0.0
-	while drawn < total:
-		var end := pos + _aim_direction * AIM_LINE_DASH
-		aim_line.add_point(pos - global_position)
-		aim_line.add_point(end - global_position)
-		pos = end + _aim_direction * AIM_LINE_GAP
-		drawn += step
+# Raycast로 1회 바운스 경로를 계산하고 점 이미지로 가이드라인을 그린다.
+func _draw_dotted_guide(from: Vector2) -> void:
+	_hide_dots()
+	var space_state := get_world_2d().direct_space_state
+	var dot_index := 0
+
+	# 1구간: 발사 지점 → 첫 충돌
+	var ray_from := from
+	var ray_dir := _aim_direction
+	var hit := _cast_ray(space_state, ray_from, ray_dir)
+
+	var first_end: Vector2
+	var bounce_normal: Vector2
+	if hit.is_empty():
+		first_end = ray_from + ray_dir * RAY_LENGTH
+		bounce_normal = Vector2.ZERO
+	else:
+		first_end = hit["position"] as Vector2
+		bounce_normal = hit["normal"] as Vector2
+
+	dot_index = _place_dots_along(ray_from, first_end, dot_index)
+
+	# 2구간: 바운스 후 경로 (충돌이 있었을 경우만)
+	if bounce_normal != Vector2.ZERO and dot_index < MAX_DOTS:
+		var bounce_dir := ray_dir.bounce(bounce_normal).normalized()
+		var second_hit := _cast_ray(space_state, first_end + bounce_dir * 2.0, bounce_dir)
+		var second_end: Vector2
+		if second_hit.is_empty():
+			second_end = first_end + bounce_dir * RAY_LENGTH
+		else:
+			second_end = second_hit["position"] as Vector2
+		dot_index = _place_dots_along(first_end, second_end, dot_index)
+
+
+# 두 점 사이에 DOT_SPACING 간격으로 점 스프라이트를 배치한다.
+func _place_dots_along(from: Vector2, to: Vector2, start_index: int) -> int:
+	var direction := (to - from).normalized()
+	var total_dist := from.distance_to(to)
+	var dist := 0.0
+	var idx := start_index
+	while dist < total_dist and idx < MAX_DOTS:
+		var pos := from + direction * dist
+		_dot_pool[idx].global_position = pos
+		_dot_pool[idx].visible = true
+		idx += 1
+		dist += DOT_SPACING
+	return idx
+
+
+# 물리 Raycast를 실행한다.
+func _cast_ray(space_state: PhysicsDirectSpaceState2D, from: Vector2, dir: Vector2) -> Dictionary:
+	var query := PhysicsRayQueryParameters2D.create(from, from + dir * RAY_LENGTH, 1)
+	return space_state.intersect_ray(query)
+
+
+# 모든 점을 숨긴다.
+func _hide_dots() -> void:
+	for dot in _dot_pool:
+		dot.visible = false
 
 
 # 조준을 해제하고 발사를 시작한다.
@@ -122,7 +178,7 @@ func _release_aim() -> void:
 	if not _is_aiming:
 		return
 	_is_aiming = false
-	aim_line.visible = false
+	_hide_dots()
 	aiming_ended.emit()
 	start_firing(GameManager.ball_count)
 
