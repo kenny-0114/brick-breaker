@@ -10,7 +10,6 @@ const BALL_ITEM_SCENE := preload("res://scenes/objects/ball_item.tscn")
 const GRID_COLS := 7
 const BRICK_MARGIN := 0.0
 const GRID_TOP_OFFSET := 80.0
-const DESCEND_AMOUNT := 36.0
 const DESCEND_DURATION := 0.3
 const FLOOR_Y := 800.0
 const FAST_FORWARD_SPEED := 3.0
@@ -22,6 +21,7 @@ var _ball_speed := 400.0
 var _balls_collected := 0
 var _first_ball_x := 240.0
 var _first_ball_landed := false
+var _cell_height := 34.0
 
 @onready var launcher: Node2D = $Launcher
 @onready var brick_container: Node2D = $BrickContainer
@@ -66,7 +66,9 @@ func _load_level(level: int) -> void:
 	_first_ball_x = 240.0
 
 	var viewport_width := get_viewport_rect().size.x
-	var brick_width := (viewport_width - BRICK_MARGIN * (GRID_COLS + 1)) / GRID_COLS
+	var cell_width := viewport_width / GRID_COLS
+	var cell_height := cell_width * 0.5
+	_cell_height = cell_height
 
 	# 벽돌 배치
 	var bricks_array: Array = data.get("bricks", []) as Array
@@ -76,10 +78,16 @@ func _load_level(level: int) -> void:
 		var col: int = int(brick_data["col"])
 		var hp: int = int(brick_data["hp"])
 		brick.position = Vector2(
-			BRICK_MARGIN + col * (brick_width + BRICK_MARGIN) + brick_width * 0.5,
-			GRID_TOP_OFFSET + row * (brick_width * 0.5 + BRICK_MARGIN)
+			(col + 0.5) * cell_width,
+			GRID_TOP_OFFSET + row * cell_height
 		)
 		brick_container.add_child(brick)
+		# 스프라이트와 충돌체를 셀 크기에 맞게 조정한다.
+		var tex_size: Vector2 = brick.sprite.texture.get_size()
+		brick.sprite.scale = Vector2(cell_width / tex_size.x, cell_height / tex_size.y)
+		var col_shape: CollisionShape2D = brick.get_node("CollisionShape2D")
+		col_shape.shape = col_shape.shape.duplicate()
+		col_shape.shape.size = Vector2(cell_width, cell_height)
 		brick.setup(hp)
 		if hp != -1:
 			_remaining_bricks += 1
@@ -92,8 +100,8 @@ func _load_level(level: int) -> void:
 		var row: int = int(item_data["row"])
 		var col: int = int(item_data["col"])
 		item.position = Vector2(
-			BRICK_MARGIN + col * (brick_width + BRICK_MARGIN) + brick_width * 0.5,
-			GRID_TOP_OFFSET + row * (brick_width * 0.5 + BRICK_MARGIN)
+			(col + 0.5) * cell_width,
+			GRID_TOP_OFFSET + row * cell_height
 		)
 		item_container.add_child(item)
 		item.collected.connect(_on_ball_item_collected)
@@ -186,17 +194,17 @@ func _descend_bricks() -> void:
 	var tween := create_tween()
 	tween.set_parallel(true)
 	for brick in brick_container.get_children():
-		tween.tween_property(brick, "position:y", brick.position.y + DESCEND_AMOUNT, DESCEND_DURATION)
+		tween.tween_property(brick, "position:y", brick.position.y + _cell_height, DESCEND_DURATION)
 	# 공 아이템도 함께 하강
 	for item in item_container.get_children():
-		tween.tween_property(item, "position:y", item.position.y + DESCEND_AMOUNT, DESCEND_DURATION)
+		tween.tween_property(item, "position:y", item.position.y + _cell_height, DESCEND_DURATION)
 	await tween.finished
 
 
 # 벽돌이 발사 라인에 도달했는지 확인한다.
 func _check_game_over() -> bool:
 	for brick in brick_container.get_children():
-		if brick.position.y >= FLOOR_Y - DESCEND_AMOUNT:
+		if brick.position.y >= FLOOR_Y - _cell_height:
 			return true
 	return false
 
