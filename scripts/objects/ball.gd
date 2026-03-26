@@ -1,6 +1,6 @@
 # scripts/objects/ball.gd
 # 턴제 벽돌깨기의 공. 일정 속도로 직선 이동하고 벽/벽돌에 반사된다.
-# 바닥 도달 시 TurnGameScene에서 회수를 처리한다.
+# 물리 엔진 반사 대신 충돌 노멀 기반 수동 반사로 결정적 동작을 보장한다.
 extends RigidBody2D
 
 const MIN_ANGLE_RAD := deg_to_rad(15.0)
@@ -44,25 +44,44 @@ func launch(direction: Vector2) -> void:
 func _physics_process(_delta: float) -> void:
 	if not _is_active:
 		return
-	_normalize_speed()
-	_correct_angle()
 	_update_trail()
 
 
-# 속도를 목표 속도로 정규화한다.
-func _normalize_speed() -> void:
-	var speed := linear_velocity.length()
-	if speed < 1.0:
+# 충돌 시 노멀 벡터로 수동 반사를 계산한다.
+func _on_body_entered(body: Node) -> void:
+	if body.has_method("hit"):
+		body.hit()
+	# 충돌 노멀을 구해 반사 방향을 직접 계산한다.
+	var collision_normal := _get_collision_normal(body)
+	if collision_normal == Vector2.ZERO:
 		return
-	linear_velocity = linear_velocity.normalized() * _target_speed
+	var vel := linear_velocity
+	var reflected := vel.bounce(collision_normal)
+	reflected = reflected.normalized() * _target_speed
+	reflected = _clamp_angle(reflected)
+	linear_velocity = reflected
+
+
+# 충돌 대상과의 노멀 벡터를 계산한다.
+func _get_collision_normal(body: Node) -> Vector2:
+	var space_state := get_world_2d().direct_space_state
+	var dir := (body.global_position - global_position).normalized()
+	var query := PhysicsRayQueryParameters2D.create(
+		global_position, global_position + dir * 50.0,
+		collision_mask, [get_rid()]
+	)
+	var result := space_state.intersect_ray(query)
+	if result.is_empty():
+		# Raycast 실패 시 위치 기반 근사 노멀 계산
+		return -(body.global_position - global_position).normalized()
+	return result["normal"]
 
 
 # 너무 수평에 가까운 각도를 보정한다.
-func _correct_angle() -> void:
-	var vel := linear_velocity
+func _clamp_angle(vel: Vector2) -> Vector2:
 	var speed := vel.length()
 	if speed < 1.0:
-		return
+		return vel
 	var dir := vel / speed
 	var angle := absf(dir.angle_to(Vector2.UP))
 	if angle < MIN_ANGLE_RAD:
@@ -73,7 +92,7 @@ func _correct_angle() -> void:
 		var sign_y: float = signf(dir.y) if dir.y != 0.0 else -1.0
 		dir.y = abs(dir.x) * tan(MIN_ANGLE_RAD) * sign_y
 		dir = dir.normalized()
-	linear_velocity = dir * _target_speed
+	return dir * _target_speed
 
 
 # 속도에 비례하여 트레일 길이를 조절한다.
@@ -87,9 +106,3 @@ func _update_trail() -> void:
 
 func is_active() -> bool:
 	return _is_active
-
-
-# 벽돌에 충돌했을 때 hit()을 호출한다.
-func _on_body_entered(body: Node) -> void:
-	if body.has_method("hit"):
-		body.hit()

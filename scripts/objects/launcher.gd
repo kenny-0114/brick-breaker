@@ -83,15 +83,15 @@ func _start_aiming(touch_pos: Vector2) -> void:
 	aiming_started.emit()
 
 
-# 조준 방향을 갱신한다. 터치 위치의 반대 방향으로 조준선을 표시한다.
+# 조준 방향을 갱신한다. 터치 위치 방향으로 조준선을 표시한다.
 func _update_aim(touch_pos: Vector2) -> void:
 	if not _is_aiming:
 		return
 	var launch_global := launch_point.global_position
-	var raw_dir := (launch_global - touch_pos).normalized()
+	var raw_dir := (touch_pos - launch_global).normalized()
 	# 위쪽 방향만 허용 (y < 0)
 	if raw_dir.y >= 0:
-		raw_dir = Vector2(-signf(raw_dir.x) if raw_dir.x != 0.0 else -1.0, -0.01).normalized()
+		raw_dir = Vector2(signf(raw_dir.x) if raw_dir.x != 0.0 else 1.0, -0.01).normalized()
 	# 각도 제한
 	var angle := raw_dir.angle_to(Vector2.UP)
 	if absf(angle) > MAX_AIM_ANGLE * 0.5:

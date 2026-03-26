@@ -138,7 +138,6 @@ func _start_aiming() -> void:
 func _on_aiming_ended() -> void:
 	_state = State.FIRING
 	_hide_launch_indicator()
-	_stuck_timer.start()
 
 
 # Launcher가 모든 공을 발사 완료했을 때 호출된다.
@@ -146,6 +145,9 @@ func _on_aiming_ended() -> void:
 func _on_all_balls_fired() -> void:
 	_state = State.WAITING
 	_set_fast_forward(true)
+	# 안전 타이머: 빨리감기 3x 고려하여 45초(실시간 ~15초)
+	_stuck_timer.wait_time = 45.0
+	_stuck_timer.start()
 
 
 # 공이 바닥에 닿았을 때 호출된다.
