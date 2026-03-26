@@ -114,7 +114,7 @@ func _create_stage_button(level: int, is_unlocked: bool, stars_data: Dictionary)
 func _on_stage_selected(level: int) -> void:
 	SoundManager.play_sfx(SoundManager.sfx_click)
 	GameManager.current_level = level
-	get_tree().change_scene_to_file("res://scenes/game_scene.tscn")
+	get_tree().change_scene_to_file("res://scenes/turn_game_scene.tscn")
 
 
 func _on_back_pressed() -> void:
