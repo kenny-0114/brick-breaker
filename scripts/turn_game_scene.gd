@@ -24,6 +24,8 @@ var _first_ball_landed := false
 var _cell_height := 34.0
 var _balls_returned := 0
 var _landing_indicator: Node2D = null
+var _launch_indicator: Node2D = null
+var _stuck_timer: Timer = null
 
 @onready var launcher: Node2D = $Launcher
 @onready var brick_container: Node2D = $BrickContainer
@@ -41,6 +43,12 @@ func _ready() -> void:
 	floor_zone.body_entered.connect(_on_floor_body_entered)
 	launcher.all_balls_fired.connect(_on_all_balls_fired)
 	launcher.aiming_ended.connect(_on_aiming_ended)
+	# 안전 타이머: 공이 끼였을 때 강제 회수
+	_stuck_timer = Timer.new()
+	_stuck_timer.wait_time = 15.0
+	_stuck_timer.one_shot = true
+	_stuck_timer.timeout.connect(_force_collect_balls)
+	add_child(_stuck_timer)
 	_load_level(GameManager.current_level)
 	_start_aiming()
 
@@ -121,6 +129,7 @@ func _start_aiming() -> void:
 	_balls_returned = 0
 	_first_ball_landed = false
 	_hide_landing_indicator()
+	_show_launch_indicator()
 	launcher.set_launch_x(_first_ball_x)
 	launcher.enable_aiming()
 
@@ -128,6 +137,8 @@ func _start_aiming() -> void:
 # 조준 해제 시 발사 상태로 전환한다.
 func _on_aiming_ended() -> void:
 	_state = State.FIRING
+	_hide_launch_indicator()
+	_stuck_timer.start()
 
 
 # Launcher가 모든 공을 발사 완료했을 때 호출된다.
@@ -172,6 +183,7 @@ func _check_all_balls_returned() -> void:
 func _end_turn() -> void:
 	_state = State.TURN_END
 	_set_fast_forward(false)
+	_stuck_timer.stop()
 	GameManager.advance_turn()
 
 	# 벽돌 하강
@@ -254,27 +266,58 @@ func _spawn_particles(pos: Vector2) -> void:
 	particles.finished.connect(particles.queue_free)
 
 
+# 발사 지점에 공 아이콘과 개수를 표시한다.
+func _show_launch_indicator() -> void:
+	_hide_launch_indicator()
+	_launch_indicator = Node2D.new()
+	_launch_indicator.z_index = 100
+	_launch_indicator.position = Vector2(_first_ball_x, FLOOR_Y)
+	var icon := Sprite2D.new()
+	icon.texture = preload("res://assets/images/ball/ballBlue_01.png")
+	icon.scale = Vector2(0.12, 0.12)
+	icon.position = Vector2(0, -10)
+	_launch_indicator.add_child(icon)
+	var label := Label.new()
+	label.name = "CountLabel"
+	label.text = "x%d" % GameManager.ball_count
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.position = Vector2(-25, -32)
+	label.size = Vector2(50, 20)
+	label.add_theme_font_size_override("font_size", 13)
+	label.add_theme_color_override("font_color", Color(0.5, 0.85, 1.0, 1.0))
+	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	label.add_theme_constant_override("outline_size", 3)
+	_launch_indicator.add_child(label)
+	add_child(_launch_indicator)
+
+
+# 발사 지점 인디케이터를 제거한다.
+func _hide_launch_indicator() -> void:
+	if _launch_indicator != null:
+		_launch_indicator.queue_free()
+		_launch_indicator = null
+
+
 # 공 착지 지점에 인디케이터(공 아이콘 + 회수 카운트)를 생성한다.
 func _create_landing_indicator() -> void:
 	_landing_indicator = Node2D.new()
+	_landing_indicator.z_index = 100
 	_landing_indicator.position = Vector2(_first_ball_x, FLOOR_Y)
-	# 공 아이콘
 	var icon := Sprite2D.new()
 	icon.texture = preload("res://assets/images/ball/ballBlue_01.png")
-	icon.scale = Vector2(0.11, 0.11)
-	icon.position = Vector2(0, -12)
+	icon.scale = Vector2(0.12, 0.12)
+	icon.position = Vector2(0, -10)
 	_landing_indicator.add_child(icon)
-	# 카운트 라벨
 	var label := Label.new()
 	label.name = "CountLabel"
 	label.text = "x1"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.position = Vector2(-20, -30)
-	label.size = Vector2(40, 20)
-	label.add_theme_font_size_override("font_size", 11)
+	label.position = Vector2(-25, -32)
+	label.size = Vector2(50, 20)
+	label.add_theme_font_size_override("font_size", 13)
 	label.add_theme_color_override("font_color", Color(0.5, 0.85, 1.0, 1.0))
 	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
-	label.add_theme_constant_override("outline_size", 2)
+	label.add_theme_constant_override("outline_size", 3)
 	_landing_indicator.add_child(label)
 	add_child(_landing_indicator)
 
@@ -293,6 +336,16 @@ func _hide_landing_indicator() -> void:
 	if _landing_indicator != null:
 		_landing_indicator.queue_free()
 		_landing_indicator = null
+
+
+# 안전 타이머 만료 시 남은 공을 강제 회수한다.
+func _force_collect_balls() -> void:
+	for ball in ball_container.get_children():
+		ball.queue_free()
+	# 다음 프레임에서 턴 종료 처리
+	await get_tree().process_frame
+	if _state == State.WAITING or _state == State.FIRING:
+		_end_turn()
 
 
 # 빨리감기를 설정/해제한다.
