@@ -98,24 +98,31 @@ func _load_level(level: int) -> void:
 	_cell_height = cell_height
 
 	# 벽돌 배치
+	var cell_size := Vector2(cell_width, cell_height)
 	var bricks_array: Array = data.get("bricks", []) as Array
 	for brick_data: Dictionary in bricks_array:
 		var brick: StaticBody2D = BRICK_SCENE.instantiate()
 		var row: int = int(brick_data["row"])
 		var col: int = int(brick_data["col"])
 		var hp: int = int(brick_data["hp"])
+		var brick_type: String = str(brick_data.get("type", "rect"))
 		brick.position = Vector2(
 			(col + 0.5) * cell_width,
 			GRID_TOP_OFFSET + row * cell_height
 		)
 		brick_container.add_child(brick)
-		# 스프라이트와 충돌체를 셀 크기에 맞게 조정한다.
-		var tex_size: Vector2 = brick.sprite.texture.get_size()
-		brick.sprite.scale = Vector2(cell_width / tex_size.x, cell_height / tex_size.y)
-		var col_shape: CollisionShape2D = brick.get_node("CollisionShape2D")
-		col_shape.shape = col_shape.shape.duplicate()
-		col_shape.shape.size = Vector2(cell_width, cell_height)
-		brick.setup(hp)
+		if brick_type == "tri":
+			# 직각삼각형 벽돌
+			var dir: int = int(brick_data.get("dir", 0))
+			brick.setup_triangle(hp, dir, cell_size)
+		else:
+			# 사각형 벽돌 — 스프라이트와 충돌체를 셀 크기에 맞게 조정한다.
+			var tex_size: Vector2 = brick.sprite.texture.get_size()
+			brick.sprite.scale = Vector2(cell_width / tex_size.x, cell_height / tex_size.y)
+			var col_shape: CollisionShape2D = brick.get_node("CollisionShape2D")
+			col_shape.shape = col_shape.shape.duplicate()
+			col_shape.shape.size = Vector2(cell_width, cell_height)
+			brick.setup(hp)
 		if hp != -1:
 			_remaining_bricks += 1
 			brick.brick_destroyed.connect(_on_brick_destroyed)
