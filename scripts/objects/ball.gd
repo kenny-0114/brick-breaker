@@ -65,7 +65,8 @@ func _on_body_entered(body: Node) -> void:
 # 충돌 대상과의 노멀 벡터를 계산한다.
 func _get_collision_normal(body: Node) -> Vector2:
 	var space_state := get_world_2d().direct_space_state
-	var dir := (body.global_position - global_position).normalized()
+	var body_pos: Vector2 = body.get("global_position") as Vector2
+	var dir: Vector2 = (body_pos - global_position).normalized()
 	var query := PhysicsRayQueryParameters2D.create(
 		global_position, global_position + dir * 50.0,
 		collision_mask, [get_rid()]
@@ -73,7 +74,7 @@ func _get_collision_normal(body: Node) -> Vector2:
 	var result := space_state.intersect_ray(query)
 	if result.is_empty():
 		# Raycast 실패 시 위치 기반 근사 노멀 계산
-		return -(body.global_position - global_position).normalized()
+		return -(body_pos - global_position).normalized()
 	return result["normal"]
 
 
