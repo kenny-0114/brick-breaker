@@ -1,5 +1,5 @@
 # scripts/game_over_menu.gd
-# 게임오버/스테이지 클리어 메뉴. 결과에 따라 다른 메시지를 보여준다.
+# 게임오버/스테이지 클리어 메뉴. 턴 수 기반 결과를 표시한다.
 extends CanvasLayer
 
 @onready var panel: Control = $Panel
@@ -15,7 +15,7 @@ func _ready() -> void:
 # 게임오버 화면을 표시한다.
 func show_game_over() -> void:
 	title_label.text = "GAME OVER"
-	score_label.text = "Score: %d" % GameManager.score
+	score_label.text = "Turn: %d" % GameManager.turn_count
 	_show_stars(0)
 	panel.visible = true
 	get_tree().paused = true
@@ -24,8 +24,9 @@ func show_game_over() -> void:
 # 스테이지 클리어 화면을 표시한다.
 func show_clear() -> void:
 	title_label.text = "STAGE CLEAR!"
-	score_label.text = "Score: %d" % GameManager.score
-	_show_stars(GameManager.lives)
+	score_label.text = "Turn: %d" % GameManager.turn_count
+	var stars := GameManager._calculate_stars()
+	_show_stars(stars)
 	panel.visible = true
 	get_tree().paused = true
 
