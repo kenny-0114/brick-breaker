@@ -1,14 +1,16 @@
 {
   "ball_speed": 400,
-  "initial_balls": 1,
-  "star_thresholds": [15, 10, 6],
+  "initial_balls": 50,
+  "star_thresholds": [12, 8, 5],
   "bricks": [
-    {"row": 0, "col": 1, "hp": 2}, {"row": 0, "col": 3, "hp": 3}, {"row": 0, "col": 5, "hp": 2},
-    {"row": 1, "col": 0, "hp": 1}, {"row": 1, "col": 2, "hp": 2}, {"row": 1, "col": 4, "hp": 2}, {"row": 1, "col": 6, "hp": 1},
-    {"row": 2, "col": 1, "hp": 1}, {"row": 2, "col": 3, "hp": 1}, {"row": 2, "col": 5, "hp": 1}
+    {"row": 0, "col": 0, "hp": 30}, {"row": 0, "col": 1, "hp": 40}, {"row": 0, "col": 2, "hp": 50}, {"row": 0, "col": 3, "hp": 60}, {"row": 0, "col": 4, "hp": 50}, {"row": 0, "col": 5, "hp": 40}, {"row": 0, "col": 6, "hp": 30},
+    {"row": 1, "col": 0, "hp": 20}, {"row": 1, "col": 1, "hp": 30}, {"row": 1, "col": 2, "hp": 35}, {"row": 1, "col": 3, "hp": 40}, {"row": 1, "col": 4, "hp": 35}, {"row": 1, "col": 5, "hp": 30}, {"row": 1, "col": 6, "hp": 20},
+    {"row": 2, "col": 0, "hp": 10}, {"row": 2, "col": 1, "hp": 15}, {"row": 2, "col": 2, "hp": 20}, {"row": 2, "col": 3, "hp": 25}, {"row": 2, "col": 4, "hp": 20}, {"row": 2, "col": 5, "hp": 15}, {"row": 2, "col": 6, "hp": 10},
+    {"row": 3, "col": 1, "hp": 8}, {"row": 3, "col": 2, "hp": 12}, {"row": 3, "col": 3, "hp": 15}, {"row": 3, "col": 4, "hp": 12}, {"row": 3, "col": 5, "hp": 8}
   ],
   "ball_items": [
     {"row": 1, "col": 1}, {"row": 1, "col": 5},
-    {"row": 2, "col": 2}, {"row": 2, "col": 4}
+    {"row": 2, "col": 0}, {"row": 2, "col": 3}, {"row": 2, "col": 6},
+    {"row": 3, "col": 1}, {"row": 3, "col": 3}, {"row": 3, "col": 5}
   ]
 }
