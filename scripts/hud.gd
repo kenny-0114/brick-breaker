@@ -22,9 +22,7 @@ func _on_score_changed(new_score: int) -> void:
 
 func _on_lives_changed(new_lives: int) -> void:
 	# 하트 문자로 라이프 표시
-	lives_label.text = ""
-	for i in new_lives:
-		lives_label.text += "♥ "
+	lives_label.text = "♥ ".repeat(new_lives)
 
 
 func _update_level() -> void:

@@ -5,11 +5,15 @@ extends Node2D
 const BRICK_SCENE := preload("res://scenes/objects/brick.tscn")
 const BALL_SCENE := preload("res://scenes/objects/ball.tscn")
 const POWERUP_SCENE := preload("res://scenes/objects/power_up.tscn")
+const PARTICLE_TEXTURE := preload("res://assets/images/particles/particleWhite_1.png")
 
 const GRID_COLS := 7
 const BRICK_MARGIN := 4.0
 const GRID_TOP_OFFSET := 80.0
 const POWERUP_DROP_CHANCE := 0.2
+
+# 파티클용 공유 머티리얼 (매번 생성하지 않고 재사용)
+static var _particle_material: ParticleProcessMaterial
 
 var _ball_speed := 300.0
 var _remaining_bricks := 0
@@ -25,6 +29,15 @@ var _remaining_bricks := 0
 
 
 func _ready() -> void:
+	if _particle_material == null:
+		_particle_material = ParticleProcessMaterial.new()
+		_particle_material.direction = Vector3(0, -1, 0)
+		_particle_material.spread = 180.0
+		_particle_material.initial_velocity_min = 50.0
+		_particle_material.initial_velocity_max = 150.0
+		_particle_material.gravity = Vector3(0, 200, 0)
+		_particle_material.scale_min = 0.5
+		_particle_material.scale_max = 1.0
 	GameManager.game_over.connect(_on_game_over)
 	GameManager.stage_cleared.connect(_on_stage_cleared)
 	_load_level(GameManager.current_level)
@@ -32,7 +45,6 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	# 터치/클릭으로 공 발사
 	if event is InputEventScreenTouch and event.pressed:
 		_launch_all_balls()
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -47,18 +59,21 @@ func _load_level(level: int) -> void:
 		push_error("GameScene: Level file not found: %s" % path)
 		return
 	var json := JSON.new()
-	json.parse(file.get_as_text())
+	var err := json.parse(file.get_as_text())
+	if err != OK:
+		push_error("GameScene: Failed to parse level JSON: %s" % json.get_error_message())
+		return
 	var data: Dictionary = json.data
 
 	GameManager.start_level(level)
-	_ball_speed = data.get("ball_speed", 300)
+	_ball_speed = float(data.get("ball_speed", 300.0))
 	_remaining_bricks = 0
 
-	# 벽돌 크기 계산
 	var viewport_width := get_viewport_rect().size.x
 	var brick_width := (viewport_width - BRICK_MARGIN * (GRID_COLS + 1)) / GRID_COLS
 
-	for brick_data: Dictionary in data["bricks"]:
+	var bricks_array: Array = data.get("bricks", [])
+	for brick_data: Dictionary in bricks_array:
 		var brick: StaticBody2D = BRICK_SCENE.instantiate()
 		var row: int = brick_data["row"]
 		var col: int = brick_data["col"]
@@ -76,34 +91,28 @@ func _load_level(level: int) -> void:
 			brick.brick_destroyed.connect(_on_brick_destroyed)
 
 
-# 새 공을 생성하여 패들 위에 배치한다.
 func _spawn_ball() -> void:
 	var ball: RigidBody2D = BALL_SCENE.instantiate()
 	ball_container.add_child(ball)
 	ball.setup(paddle, _ball_speed)
 
 
-# 대기 중인 모든 공을 발사한다.
 func _launch_all_balls() -> void:
-	for ball: Node in ball_container.get_children():
-		if ball.has_method("launch"):
-			ball.launch()
+	for ball: RigidBody2D in ball_container.get_children():
+		ball.launch()
 
 
-# 벽돌 파괴 시 점수 추가, 아이템 드롭, 클리어 판정을 처리한다.
 func _on_brick_destroyed(pos: Vector2, hp: int) -> void:
 	GameManager.add_brick_score(hp)
 	_remaining_bricks -= 1
 	_spawn_particles(pos)
-	# 아이템 드롭
 	if randf() < POWERUP_DROP_CHANCE:
 		_spawn_powerup(pos)
-	# 클리어 판정
 	if _remaining_bricks <= 0:
 		GameManager.clear_stage()
 
 
-# 파괴 파티클을 생성한다.
+# 파괴 파티클을 생성한다. 공유 머티리얼을 재사용한다.
 func _spawn_particles(pos: Vector2) -> void:
 	var particles := GPUParticles2D.new()
 	particles.position = pos
@@ -111,38 +120,27 @@ func _spawn_particles(pos: Vector2) -> void:
 	particles.one_shot = true
 	particles.amount = 8
 	particles.lifetime = 0.4
-	# ParticleProcessMaterial로 간단한 폭발 효과
-	var mat := ParticleProcessMaterial.new()
-	mat.direction = Vector3(0, -1, 0)
-	mat.spread = 180.0
-	mat.initial_velocity_min = 50.0
-	mat.initial_velocity_max = 150.0
-	mat.gravity = Vector3(0, 200, 0)
-	mat.scale_min = 0.5
-	mat.scale_max = 1.0
-	particles.process_material = mat
-	particles.texture = preload("res://assets/images/particles/particleWhite_1.png")
+	particles.process_material = _particle_material
+	particles.texture = PARTICLE_TEXTURE
 	add_child(particles)
-	# 파티클 재생 완료 후 자동 제거
-	get_tree().create_timer(0.5).timeout.connect(particles.queue_free)
+	particles.finished.connect(particles.queue_free)
 
 
-# 파워업 아이템을 생성한다.
 func _spawn_powerup(pos: Vector2) -> void:
 	var powerup: Area2D = POWERUP_SCENE.instantiate()
 	powerup.position = pos
-	var type: int = randi() % 2  # 0: EXPAND, 1: MULTI_BALL
+	var powerup_types: Array = [0, 1]
+	var type: int = powerup_types.pick_random()
 	item_container.add_child(powerup)
 	powerup.setup(type)
 	powerup.collected.connect(_on_powerup_collected)
 
 
-# 파워업 수집 시 효과를 적용한다.
 func _on_powerup_collected(type: int) -> void:
 	match type:
-		0:  # EXPAND
+		0:
 			paddle.expand()
-		1:  # MULTI_BALL
+		1:
 			_spawn_multi_balls()
 
 
@@ -156,17 +154,14 @@ func _spawn_multi_balls() -> void:
 		var new_ball: RigidBody2D = BALL_SCENE.instantiate()
 		ball_container.add_child(new_ball)
 		new_ball.global_position = ref_ball.global_position
-		new_ball.freeze = false
-		new_ball._is_launched = true
 		var rotated_vel := ref_ball.linear_velocity.rotated(deg_to_rad(angle_offset))
-		new_ball.linear_velocity = rotated_vel
+		new_ball.launch_with_velocity(rotated_vel)
 
 
-# DeathZone에 공이 들어오면 제거하고 라이프를 판정한다.
 func _on_death_zone_body_entered(body: Node2D) -> void:
 	if body.is_in_group("ball"):
 		body.queue_free()
-		# 모든 공이 사라졌는지 확인 (다음 프레임에서 체크)
+		# 모든 공이 사라졌는지 다음 프레임에서 체크 (queue_free 반영 대기)
 		await get_tree().process_frame
 		if ball_container.get_child_count() == 0:
 			GameManager.lose_life()

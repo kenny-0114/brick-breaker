@@ -8,6 +8,8 @@ const SFX_POOL_SIZE := 5
 var _bgm_player: AudioStreamPlayer
 var _sfx_pool: Array[AudioStreamPlayer] = []
 var _sfx_index: int = 0
+var _bgm_bus_idx: int = -1
+var _sfx_bus_idx: int = -1
 
 # 프리로드할 UI 사운드
 var sfx_click: AudioStream = preload("res://assets/sounds/click-a.ogg")
@@ -31,7 +33,7 @@ func _ready() -> void:
 	_apply_saved_volume()
 
 
-# BGM과 SFX 오디오 버스를 생성한다.
+# BGM과 SFX 오디오 버스를 생성하고 인덱스를 캐싱한다.
 func _setup_audio_buses() -> void:
 	if AudioServer.get_bus_index("BGM") == -1:
 		var idx := AudioServer.bus_count
@@ -43,6 +45,8 @@ func _setup_audio_buses() -> void:
 		AudioServer.add_bus()
 		AudioServer.set_bus_name(idx, "SFX")
 		AudioServer.set_bus_send(idx, "Master")
+	_bgm_bus_idx = AudioServer.get_bus_index("BGM")
+	_sfx_bus_idx = AudioServer.get_bus_index("SFX")
 
 
 # SFX를 풀에서 하나 골라 재생한다.
@@ -69,12 +73,12 @@ func stop_bgm() -> void:
 # 볼륨을 설정하고 저장한다. volume은 0.0~1.0 범위이다.
 func set_bgm_volume(volume: float) -> void:
 	var db := linear_to_db(clampf(volume, 0.0, 1.0))
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("BGM"), db)
+	AudioServer.set_bus_volume_db(_bgm_bus_idx, db)
 
 
 func set_sfx_volume(volume: float) -> void:
 	var db := linear_to_db(clampf(volume, 0.0, 1.0))
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), db)
+	AudioServer.set_bus_volume_db(_sfx_bus_idx, db)
 
 
 # 저장된 볼륨 설정을 적용한다.

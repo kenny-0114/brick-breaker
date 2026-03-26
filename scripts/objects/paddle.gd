@@ -3,7 +3,6 @@
 # 공의 패들 타격 위치에 따라 반사각을 조정한다.
 extends AnimatableBody2D
 
-signal paddle_hit(hit_position: float)
 
 const EXPAND_SCALE := 1.5
 const EXPAND_DURATION := 10.0

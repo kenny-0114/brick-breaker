@@ -14,7 +14,6 @@ const TEXTURES := {
 
 var hp: int = 1
 var max_hp: int = 1
-var is_indestructible: bool = false
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -23,7 +22,6 @@ var is_indestructible: bool = false
 func setup(brick_hp: int) -> void:
 	hp = brick_hp
 	if hp == -1:
-		is_indestructible = true
 		max_hp = -1
 	else:
 		max_hp = hp
@@ -32,7 +30,7 @@ func setup(brick_hp: int) -> void:
 
 # 공에 맞았을 때 호출된다. HP를 감소시키고 파괴 여부를 판정한다.
 func hit() -> void:
-	if is_indestructible:
+	if hp == -1:
 		return
 	hp -= 1
 	if hp <= 0:
