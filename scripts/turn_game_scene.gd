@@ -12,10 +12,13 @@ const BRICK_MARGIN := 0.0
 const GRID_TOP_OFFSET := 80.0
 const DESCEND_DURATION := 0.3
 const FLOOR_Y := 800.0
-const FAST_FORWARD_SPEED := 3.0
+const SPEED_RAMP_DELAY_1 := 5.0
+const SPEED_RAMP_DELAY_2 := 10.0
+const SPEED_STAGE_1 := 2.0
+const SPEED_STAGE_2 := 3.0
 
 var _state: State = State.AIMING
-var _is_fast_forward := false
+var _waiting_elapsed := 0.0
 var _remaining_bricks := 0
 var _ball_speed := 400.0
 var _balls_collected := 0
@@ -51,6 +54,20 @@ func _ready() -> void:
 	add_child(_stuck_timer)
 	_load_level(GameManager.current_level)
 	_start_aiming()
+
+
+# 대기 중 실시간 경과를 추적하여 점진적 배속을 적용한다.
+func _process(delta: float) -> void:
+	if _state != State.WAITING:
+		return
+	# delta는 time_scale 적용 후이므로 실시간으로 환산한다.
+	var real_delta := delta / Engine.time_scale if Engine.time_scale > 0 else delta
+	_waiting_elapsed += real_delta
+	# 경과 시간에 따라 배속 단계를 올린다.
+	if _waiting_elapsed >= SPEED_RAMP_DELAY_2 and Engine.time_scale < SPEED_STAGE_2:
+		Engine.time_scale = SPEED_STAGE_2
+	elif _waiting_elapsed >= SPEED_RAMP_DELAY_1 and Engine.time_scale < SPEED_STAGE_1:
+		Engine.time_scale = SPEED_STAGE_1
 
 
 # JSON에서 레벨 데이터를 읽어 벽돌과 공 아이템을 배치한다.
@@ -144,9 +161,10 @@ func _on_aiming_ended() -> void:
 # 발사 완료 시 자동으로 빨리감기를 활성화한다.
 func _on_all_balls_fired() -> void:
 	_state = State.WAITING
-	_set_fast_forward(true)
-	# 안전 타이머: 빨리감기 3x 고려하여 45초(실시간 ~15초)
-	_stuck_timer.wait_time = 45.0
+	_waiting_elapsed = 0.0
+	Engine.time_scale = 1.0
+	# 안전 타이머: 20초 실시간 (배속 올라가면 게임시간으로 더 빨리 흐름)
+	_stuck_timer.wait_time = 60.0
 	_stuck_timer.start()
 
 
@@ -184,7 +202,7 @@ func _check_all_balls_returned() -> void:
 # 턴을 종료한다: 벽돌 하강, 게임오버/클리어 체크, 아이템 정산.
 func _end_turn() -> void:
 	_state = State.TURN_END
-	_set_fast_forward(false)
+	Engine.time_scale = 1.0
 	_stuck_timer.stop()
 	GameManager.advance_turn()
 
@@ -350,17 +368,11 @@ func _force_collect_balls() -> void:
 		_end_turn()
 
 
-# 빨리감기를 설정/해제한다.
-func _set_fast_forward(enabled: bool) -> void:
-	_is_fast_forward = enabled
-	Engine.time_scale = FAST_FORWARD_SPEED if enabled else 1.0
-
-
 func _on_game_over() -> void:
-	_set_fast_forward(false)
+	Engine.time_scale = 1.0
 	game_over_menu.show_game_over()
 
 
 func _on_stage_cleared() -> void:
-	_set_fast_forward(false)
+	Engine.time_scale = 1.0
 	game_over_menu.show_clear()
