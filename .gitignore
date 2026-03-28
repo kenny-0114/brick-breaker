@@ -8,3 +8,14 @@ kenney_ui-pack/
 kenney-pack/
 sounds_resource/
 kenney_game-icons/
+
+# 개발 임시 파일
+.playwright-mcp/
+skills-lock.json
+
+# 목업 임시 파일 (스크린샷, 이전 버전 HTML)
+mockup/화면 캡처*
+mockup/brick_mockup*.html
+mockup/ui_mockup.html
+mockup_clear_*.png
+mockup_clear_*.png.import
