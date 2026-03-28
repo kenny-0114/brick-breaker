@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Brick Breaker - Level Editor</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #ddd; font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+  /* ===== Top Bar ===== */
+  .topbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #16213e; border-bottom: 1px solid #2a2a4a; flex-shrink: 0; }
+  .topbar button, .topbar select { padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+  .topbar select { background: #2a2a4a; color: #ddd; min-width: 140px; }
+  .btn-primary { background: #4cc355; color: #fff; }
+  .btn-primary:hover { background: #5ad365; }
+  .btn-secondary { background: #45b0e6; color: #fff; }
+  .btn-secondary:hover { background: #55c0f6; }
+  .btn-danger { background: #e14b5a; color: #fff; }
+  .btn-danger:hover { background: #f05565; }
+  .btn-grey { background: #555568; color: #ddd; }
+  .btn-grey:hover { background: #666678; }
+  .topbar .title { margin-left: auto; font-weight: bold; color: #778; font-size: 14px; letter-spacing: 1px; }
+  .toast { position: fixed; top: 12px; right: 12px; background: #4cc355; color: #fff; padding: 8px 16px; border-radius: 6px; font-weight: bold; display: none; z-index: 100; }
+
+  /* ===== Main Layout ===== */
+  .main { display: flex; flex: 1; overflow: hidden; }
+
+  /* ===== Tools Panel ===== */
+  .tools { width: 120px; background: #16213e; border-right: 1px solid #2a2a4a; padding: 12px 8px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+  .tools h3 { font-size: 11px; color: #667; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+  .tool-btn { width: 100%; padding: 8px 4px; border: 2px solid transparent; border-radius: 6px; background: #2a2a4a; color: #ccc; font-size: 12px; cursor: pointer; text-align: center; }
+  .tool-btn:hover { background: #3a3a5a; }
+  .tool-btn.active { border-color: #45b0e6; background: #2a3a5a; color: #fff; }
+  .hp-control { display: flex; align-items: center; gap: 4px; }
+  .hp-control input { width: 48px; text-align: center; background: #2a2a4a; border: 1px solid #3a3a5a; color: #fff; border-radius: 4px; padding: 4px; font-size: 13px; }
+  .hp-control button { width: 28px; height: 28px; border: none; border-radius: 4px; background: #3a3a5a; color: #fff; font-size: 14px; cursor: pointer; }
+  .hp-control button:hover { background: #4a4a6a; }
+  .dir-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .dir-btn { padding: 6px; border: 2px solid transparent; border-radius: 4px; background: #2a2a4a; color: #ccc; font-size: 14px; cursor: pointer; text-align: center; }
+  .dir-btn:hover { background: #3a3a5a; }
+  .dir-btn.active { border-color: #f5a623; background: #3a3520; }
+  .inf-btn { width: 100%; padding: 6px; border: 2px solid transparent; border-radius: 4px; background: #2a2a4a; color: #8a8a95; font-size: 11px; cursor: pointer; font-weight: bold; }
+  .inf-btn.active { border-color: #8a8a95; background: #2a2a3a; }
+
+  /* ===== Grid Area ===== */
+  .grid-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; background: #0f0f23; }
+  canvas { border: 1px solid #2a2a4a; cursor: crosshair; }
+
+  /* ===== Properties Panel ===== */
+  .props { width: 190px; background: #16213e; border-left: 1px solid #2a2a4a; padding: 12px 10px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; overflow-y: auto; }
+  .props h3 { font-size: 11px; color: #667; text-transform: uppercase; letter-spacing: 1px; }
+  .prop-row { display: flex; align-items: center; gap: 6px; }
+  .prop-row label { min-width: 65px; font-size: 11px; color: #99a; }
+  .prop-row input { flex: 1; background: #2a2a4a; border: 1px solid #3a3a5a; color: #fff; border-radius: 4px; padding: 4px 6px; font-size: 12px; }
+  .prop-row input[type=number] { width: 55px; }
+  .star-inputs { display: flex; gap: 4px; }
+  .star-inputs input { width: 40px; text-align: center; }
+  .separator { height: 1px; background: #2a2a4a; margin: 4px 0; }
+  .sel-info { font-size: 12px; color: #aab; }
+  .sel-dir-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+  .sel-dir-btn { padding: 5px; border: 2px solid transparent; border-radius: 4px; background: #2a2a4a; color: #ccc; font-size: 13px; cursor: pointer; text-align: center; }
+  .sel-dir-btn:hover { background: #3a3a5a; }
+  .sel-dir-btn.active { border-color: #f5a623; }
+
+  /* ===== JSON Preview ===== */
+  .json-bar { background: #16213e; border-top: 1px solid #2a2a4a; flex-shrink: 0; }
+  .json-toggle { width: 100%; padding: 6px; background: none; border: none; color: #667; cursor: pointer; font-size: 11px; text-align: left; padding-left: 12px; }
+  .json-toggle:hover { color: #99a; }
+  .json-preview { max-height: 200px; overflow-y: auto; padding: 8px 12px; background: #0f0f23; font-family: monospace; font-size: 11px; color: #8a8; white-space: pre; display: none; }
+
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="toast" id="toast">Saved!</div>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <select id="stageSelect"><option>Loading...</option></select>
+  <button class="btn-primary" id="btnNew">+ New</button>
+  <button class="btn-grey" id="btnSave">Save</button>
+  <button class="btn-danger" id="btnDelete">Delete</button>
+  <span class="title">Level Editor</span>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Tools -->
+  <div class="tools">
+    <h3>Tools</h3>
+    <button class="tool-btn active" data-tool="rect">□ Rect</button>
+    <button class="tool-btn" data-tool="tri">△ Tri</button>
+    <button class="tool-btn" data-tool="ball">⊕ Ball</button>
+    <button class="tool-btn" data-tool="eraser">✕ Erase</button>
+
+    <h3>HP</h3>
+    <div class="hp-control">
+      <button id="hpDec">-</button>
+      <input type="number" id="hpInput" value="10" min="-1" max="999">
+      <button id="hpInc">+</button>
+    </div>
+    <button class="inf-btn" id="btnInf">INF (-1)</button>
+
+    <h3>Direction</h3>
+    <div class="dir-grid" id="dirGrid">
+      <button class="dir-btn" data-dir="2">◤</button>
+      <button class="dir-btn" data-dir="3">◥</button>
+      <button class="dir-btn" data-dir="0">◣</button>
+      <button class="dir-btn active" data-dir="3">◥</button>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="grid-area">
+    <canvas id="gridCanvas"></canvas>
+  </div>
+
+  <!-- Properties -->
+  <div class="props">
+    <h3>Stage Settings</h3>
+    <div class="prop-row"><label>ball_speed</label><input type="number" id="propSpeed" value="400"></div>
+    <div class="prop-row"><label>init_balls</label><input type="number" id="propBalls" value="50"></div>
+    <div class="prop-row"><label>stars</label>
+      <div class="star-inputs">
+        <input type="number" id="propStar1" value="10">
+        <input type="number" id="propStar2" value="7">
+        <input type="number" id="propStar3" value="4">
+      </div>
+    </div>
+    <div class="separator"></div>
+    <h3>Selected Cell</h3>
+    <div id="selInfo" class="sel-info">No selection</div>
+    <div id="selProps" style="display:none;">
+      <div class="prop-row"><label>Type</label><span id="selType">-</span></div>
+      <div class="prop-row" id="selHpRow"><label>HP</label>
+        <div class="hp-control">
+          <button id="selHpDec">-</button>
+          <input type="number" id="selHpInput" value="10" min="-1">
+          <button id="selHpInc">+</button>
+        </div>
+      </div>
+      <div id="selDirRow" style="display:none;">
+        <div class="prop-row"><label>Dir</label></div>
+        <div class="sel-dir-grid" id="selDirGrid">
+          <button class="sel-dir-btn" data-dir="2">◤</button>
+          <button class="sel-dir-btn" data-dir="3">◥</button>
+          <button class="sel-dir-btn" data-dir="0">◣</button>
+          <button class="sel-dir-btn" data-dir="1">◢</button>
+        </div>
+      </div>
+      <button class="btn-danger" id="btnDeleteCell" style="width:100%;margin-top:8px;padding:6px;">Delete Cell</button>
+    </div>
+  </div>
+</div>
+
+<!-- JSON Preview -->
+<div class="json-bar">
+  <button class="json-toggle" id="jsonToggle">▶ JSON Preview</button>
+  <pre class="json-preview" id="jsonPreview"></pre>
+</div>
+
+<script>
+// ===== API =====
+const API_LEVELS = '../data/levels/';
+
+// ===== State =====
+const ROWS = 13, COLS = 10;
+const HP_COLORS = { green: '#8bc34a', orange: '#f5a623', red: '#e74c3c', grey: '#8a8a95' };
+const MORTAR = { green: '#5a8525', orange: '#b87808', red: '#982520', grey: '#505058' };
+const TRI_LABELS = { 0: '◣', 1: '◢', 2: '◤', 3: '◥' };
+
+let grid = []; // grid[row][col] = null | {type:'rect',hp} | {type:'tri',hp,dir} | {type:'ball'}
+let currentTool = 'rect';
+let currentHp = 10;
+let currentDir = 3;
+let selectedCell = null; // {row, col}
+let isDirty = false;
+let currentFileName = '';
+let stageFiles = [];
+let isDragging = false;
+let currentFileIndex = 0;
+
+let stageSettings = { ball_speed: 400, initial_balls: 50, star_thresholds: [10, 7, 4] };
+
+// ===== Init Grid =====
+function initGrid() {
+  grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+}
+initGrid();
+
+// ===== Canvas =====
+const canvas = document.getElementById('gridCanvas');
+const ctx = canvas.getContext('2d');
+let cellSize = 48;
+
+function resizeCanvas() {
+  const area = document.querySelector('.grid-area');
+  const maxW = area.clientWidth - 24;
+  const maxH = area.clientHeight - 24;
+  cellSize = Math.floor(Math.min(maxW / COLS, maxH / ROWS));
+  canvas.width = cellSize * COLS;
+  canvas.height = cellSize * ROWS;
+  render();
+}
+
+function getHpColor(hp) {
+  if (hp === -1) return 'grey';
+  if (hp <= 10) return 'green';
+  if (hp <= 30) return 'orange';
+  return 'red';
+}
+
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Background
+  ctx.fillStyle = '#16163a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const x = c * cellSize, y = r * cellSize;
+      const cell = grid[r][c];
+
+      // Grid lines
+      ctx.strokeStyle = '#2a2a4a';
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(x, y, cellSize, cellSize);
+
+      if (!cell) continue;
+
+      if (cell.type === 'ball') {
+        // Ball item
+        ctx.fillStyle = '#4cc355';
+        ctx.beginPath();
+        ctx.arc(x + cellSize/2, y + cellSize/2, cellSize * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#3a9944';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${cellSize * 0.35}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('+', x + cellSize/2, y + cellSize/2);
+      } else if (cell.type === 'tri') {
+        drawTriBrick(x, y, cell);
+      } else {
+        // Rect brick
+        const colorKey = getHpColor(cell.hp);
+        const base = HP_COLORS[colorKey];
+        const mortar = MORTAR[colorKey];
+        // Mortar border
+        ctx.fillStyle = mortar;
+        ctx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+        // Brick fill
+        ctx.fillStyle = base;
+        ctx.fillRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
+        // HP text
+        drawHpText(x + cellSize/2, y + cellSize/2, cell.hp);
+      }
+
+      // Selection highlight
+      if (selectedCell && selectedCell.row === r && selectedCell.col === c) {
+        ctx.strokeStyle = '#45b0e6';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+      }
+    }
+  }
+}
+
+function drawTriBrick(x, y, cell) {
+  const colorKey = getHpColor(cell.hp);
+  const base = HP_COLORS[colorKey];
+  const mortar = MORTAR[colorKey];
+  const s = cellSize;
+  const verts = {
+    0: [[0,0],[0,s],[s,s]], // ◣
+    1: [[s,0],[0,s],[s,s]], // ◢
+    2: [[0,0],[s,0],[0,s]], // ◤
+    3: [[0,0],[s,0],[s,s]], // ◥
+  };
+  const pts = verts[cell.dir] || verts[3];
+
+  // Mortar (full size)
+  ctx.beginPath();
+  ctx.moveTo(x + pts[0][0], y + pts[0][1]);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(x + pts[i][0], y + pts[i][1]);
+  ctx.closePath();
+  ctx.fillStyle = mortar;
+  ctx.fill();
+
+  // Inner (shrunk)
+  const cx = (pts[0][0]+pts[1][0]+pts[2][0])/3;
+  const cy = (pts[0][1]+pts[1][1]+pts[2][1])/3;
+  ctx.beginPath();
+  const shrink = 0.88;
+  const ip = pts.map(p => [cx + (p[0]-cx)*shrink, cy + (p[1]-cy)*shrink]);
+  ctx.moveTo(x + ip[0][0], y + ip[0][1]);
+  for (let i = 1; i < ip.length; i++) ctx.lineTo(x + ip[i][0], y + ip[i][1]);
+  ctx.closePath();
+  ctx.fillStyle = base;
+  ctx.fill();
+
+  // HP text (toward right angle)
+  const centroids = {
+    0: [-1/3, 1/3], 1: [1/3, 1/3], 2: [-1/3, -1/3], 3: [1/3, -1/3]
+  };
+  const co = centroids[cell.dir] || [0,0];
+  const tx = x + s/2 + co[0] * s * 0.35;
+  const ty = y + s/2 + co[1] * s * 0.35;
+  drawHpText(tx, ty, cell.hp);
+}
+
+function drawHpText(x, y, hp) {
+  ctx.fillStyle = '#fff';
+  ctx.font = `bold ${cellSize * 0.28}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 2;
+  ctx.fillText(hp === -1 ? 'INF' : hp, x, y);
+  ctx.shadowBlur = 0;
+}
+
+// ===== Mouse Events =====
+function getCellFromMouse(e) {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const col = Math.floor(mx / cellSize), row = Math.floor(my / cellSize);
+  if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return null;
+  return { row, col };
+}
+
+function applyTool(row, col) {
+  const existing = grid[row][col];
+  if (currentTool === 'eraser') {
+    if (existing) { grid[row][col] = null; markDirty(); }
+  } else if (currentTool === 'rect') {
+    if (existing) { selectCell(row, col); return; }
+    grid[row][col] = { type: 'rect', hp: currentHp };
+    markDirty();
+  } else if (currentTool === 'tri') {
+    if (existing) { selectCell(row, col); return; }
+    grid[row][col] = { type: 'tri', hp: currentHp, dir: currentDir };
+    markDirty();
+  } else if (currentTool === 'ball') {
+    if (existing) { selectCell(row, col); return; }
+    grid[row][col] = { type: 'ball' };
+    markDirty();
+  }
+  render();
+}
+
+canvas.addEventListener('mousedown', e => {
+  const cell = getCellFromMouse(e);
+  if (!cell) return;
+  isDragging = true;
+  const existing = grid[cell.row][cell.col];
+  // If clicking on existing with placement tool → select
+  if (existing && currentTool !== 'eraser') {
+    selectCell(cell.row, cell.col);
+    render();
+    return;
+  }
+  applyTool(cell.row, cell.col);
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  const cell = getCellFromMouse(e);
+  if (!cell) return;
+  // Only continuous place/erase on empty or erase mode
+  if (currentTool === 'eraser') {
+    if (grid[cell.row][cell.col]) { grid[cell.row][cell.col] = null; markDirty(); render(); }
+  } else if (!grid[cell.row][cell.col]) {
+    applyTool(cell.row, cell.col);
+  }
+});
+
+canvas.addEventListener('mouseup', () => { isDragging = false; });
+canvas.addEventListener('mouseleave', () => { isDragging = false; });
+
+// ===== Selection =====
+function selectCell(row, col) {
+  selectedCell = { row, col };
+  updateSelectionUI();
+}
+
+function clearSelection() {
+  selectedCell = null;
+  document.getElementById('selInfo').textContent = 'No selection';
+  document.getElementById('selProps').style.display = 'none';
+  render();
+}
+
+function updateSelectionUI() {
+  if (!selectedCell) return;
+  const cell = grid[selectedCell.row][selectedCell.col];
+  if (!cell) { clearSelection(); return; }
+
+  document.getElementById('selInfo').textContent = `Row ${selectedCell.row}, Col ${selectedCell.col}`;
+  document.getElementById('selProps').style.display = 'block';
+
+  if (cell.type === 'ball') {
+    document.getElementById('selType').textContent = 'Ball Item';
+    document.getElementById('selHpRow').style.display = 'none';
+    document.getElementById('selDirRow').style.display = 'none';
+  } else {
+    document.getElementById('selType').textContent = cell.type === 'tri' ? 'Triangle' : 'Rectangle';
+    document.getElementById('selHpRow').style.display = 'flex';
+    document.getElementById('selHpInput').value = cell.hp;
+    if (cell.type === 'tri') {
+      document.getElementById('selDirRow').style.display = 'block';
+      document.querySelectorAll('.sel-dir-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.dir) === cell.dir));
+    } else {
+      document.getElementById('selDirRow').style.display = 'none';
+    }
+  }
+  render();
+}
+
+// ===== Tools Panel Events =====
+document.querySelectorAll('.tool-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTool = btn.dataset.tool;
+  });
+});
+
+document.getElementById('hpInput').addEventListener('change', e => { currentHp = parseInt(e.target.value) || 1; });
+document.getElementById('hpInc').addEventListener('click', () => { currentHp = Math.min(999, currentHp + (event.shiftKey ? 10 : 1)); document.getElementById('hpInput').value = currentHp; });
+document.getElementById('hpDec').addEventListener('click', () => { currentHp = Math.max(1, currentHp - (event.shiftKey ? 10 : 1)); document.getElementById('hpInput').value = currentHp; });
+document.getElementById('btnInf').addEventListener('click', () => {
+  const btn = document.getElementById('btnInf');
+  if (currentHp === -1) { currentHp = 10; btn.classList.remove('active'); }
+  else { currentHp = -1; btn.classList.add('active'); }
+  document.getElementById('hpInput').value = currentHp;
+});
+
+// Direction buttons - rebuild properly
+const dirGridEl = document.getElementById('dirGrid');
+dirGridEl.innerHTML = '';
+[2, 3, 0, 1].forEach(d => {
+  const btn = document.createElement('button');
+  btn.className = 'dir-btn' + (d === currentDir ? ' active' : '');
+  btn.dataset.dir = d;
+  btn.textContent = TRI_LABELS[d];
+  btn.addEventListener('click', () => {
+    currentDir = d;
+    dirGridEl.querySelectorAll('.dir-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.dir) === d));
+  });
+  dirGridEl.appendChild(btn);
+});
+
+// ===== Selection Properties Events =====
+document.getElementById('selHpInput').addEventListener('change', e => {
+  if (!selectedCell) return;
+  const cell = grid[selectedCell.row][selectedCell.col];
+  if (cell && cell.type !== 'ball') { cell.hp = parseInt(e.target.value) || 1; markDirty(); render(); }
+});
+document.getElementById('selHpInc').addEventListener('click', () => {
+  if (!selectedCell) return;
+  const cell = grid[selectedCell.row][selectedCell.col];
+  if (cell && cell.type !== 'ball') { cell.hp = Math.min(999, cell.hp + (event.shiftKey ? 10 : 1)); markDirty(); updateSelectionUI(); }
+});
+document.getElementById('selHpDec').addEventListener('click', () => {
+  if (!selectedCell) return;
+  const cell = grid[selectedCell.row][selectedCell.col];
+  if (cell && cell.type !== 'ball') { cell.hp = Math.max(-1, cell.hp - (event.shiftKey ? 10 : 1)); markDirty(); updateSelectionUI(); }
+});
+document.querySelectorAll('.sel-dir-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!selectedCell) return;
+    const cell = grid[selectedCell.row][selectedCell.col];
+    if (cell && cell.type === 'tri') { cell.dir = parseInt(btn.dataset.dir); markDirty(); updateSelectionUI(); }
+  });
+});
+document.getElementById('btnDeleteCell').addEventListener('click', () => {
+  if (!selectedCell) return;
+  grid[selectedCell.row][selectedCell.col] = null;
+  markDirty();
+  clearSelection();
+});
+
+// ===== Stage Settings =====
+['propSpeed', 'propBalls', 'propStar1', 'propStar2', 'propStar3'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    stageSettings.ball_speed = parseInt(document.getElementById('propSpeed').value) || 400;
+    stageSettings.initial_balls = parseInt(document.getElementById('propBalls').value) || 50;
+    stageSettings.star_thresholds = [
+      parseInt(document.getElementById('propStar1').value) || 10,
+      parseInt(document.getElementById('propStar2').value) || 7,
+      parseInt(document.getElementById('propStar3').value) || 4,
+    ];
+    markDirty();
+  });
+});
+
+// ===== JSON Preview =====
+document.getElementById('jsonToggle').addEventListener('click', () => {
+  const pre = document.getElementById('jsonPreview');
+  const btn = document.getElementById('jsonToggle');
+  if (pre.style.display === 'none' || !pre.style.display) {
+    pre.style.display = 'block';
+    btn.textContent = '▼ JSON Preview';
+    pre.textContent = JSON.stringify(gridToJson(), null, 2);
+  } else {
+    pre.style.display = 'none';
+    btn.textContent = '▶ JSON Preview';
+  }
+});
+
+// ===== Grid <-> JSON =====
+function gridToJson() {
+  const bricks = [], ball_items = [];
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const cell = grid[r][c];
+      if (!cell) continue;
+      if (cell.type === 'ball') {
+        ball_items.push({ row: r, col: c });
+      } else if (cell.type === 'tri') {
+        bricks.push({ row: r, col: c, hp: cell.hp, type: 'tri', dir: cell.dir });
+      } else {
+        bricks.push({ row: r, col: c, hp: cell.hp });
+      }
+    }
+  }
+  return {
+    ball_speed: stageSettings.ball_speed,
+    initial_balls: stageSettings.initial_balls,
+    star_thresholds: stageSettings.star_thresholds,
+    bricks,
+    ball_items
+  };
+}
+
+function jsonToGrid(data) {
+  initGrid();
+  stageSettings.ball_speed = data.ball_speed || 400;
+  stageSettings.initial_balls = data.initial_balls || 50;
+  stageSettings.star_thresholds = data.star_thresholds || [10, 7, 4];
+
+  document.getElementById('propSpeed').value = stageSettings.ball_speed;
+  document.getElementById('propBalls').value = stageSettings.initial_balls;
+  document.getElementById('propStar1').value = stageSettings.star_thresholds[0];
+  document.getElementById('propStar2').value = stageSettings.star_thresholds[1];
+  document.getElementById('propStar3').value = stageSettings.star_thresholds[2];
+
+  for (const b of (data.bricks || [])) {
+    if (b.row < ROWS && b.col < COLS) {
+      if (b.type === 'tri') {
+        grid[b.row][b.col] = { type: 'tri', hp: b.hp, dir: b.dir || 0 };
+      } else {
+        grid[b.row][b.col] = { type: 'rect', hp: b.hp };
+      }
+    }
+  }
+  for (const item of (data.ball_items || [])) {
+    if (item.row < ROWS && item.col < COLS) {
+      grid[item.row][item.col] = { type: 'ball' };
+    }
+  }
+  clearSelection();
+  render();
+  updateJsonPreview();
+}
+
+function updateJsonPreview() {
+  const pre = document.getElementById('jsonPreview');
+  if (pre.style.display !== 'none' && pre.style.display) {
+    pre.textContent = JSON.stringify(gridToJson(), null, 2);
+  }
+}
+
+// ===== Dirty State =====
+function markDirty() {
+  isDirty = true;
+  updateJsonPreview();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 2000);
+}
+
+// ===== 서버에서 레벨 목록을 읽어온다 =====
+async function loadLevelsFromServer() {
+  // data/levels/ 디렉토리 내 level_*.json 파일을 1~99까지 탐색
+  stageFiles = [];
+  for (let i = 1; i <= 99; i++) {
+    const name = `level_${i}.json`;
+    try {
+      const res = await fetch(API_LEVELS + name);
+      if (!res.ok) continue;
+      const data = await res.json();
+      stageFiles.push({ name, data });
+    } catch (e) { continue; }
+  }
+  populateDropdown();
+  if (stageFiles.length > 0) loadStageByIndex(0);
+  else showToast('레벨 파일 없음 — python tools/run_editor.py 로 실행하세요');
+}
+
+function populateDropdown() {
+  const sel = document.getElementById('stageSelect');
+  sel.innerHTML = '';
+  stageFiles.forEach((f, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = f.name;
+    sel.appendChild(opt);
+  });
+}
+
+function loadStageByIndex(index) {
+  const f = stageFiles[index];
+  currentFileName = f.name;
+  currentFileIndex = index;
+  jsonToGrid(f.data || {});
+  isDirty = false;
+  document.getElementById('stageSelect').selectedIndex = index;
+}
+
+// 드롭다운 전환
+document.getElementById('stageSelect').addEventListener('change', (e) => {
+  if (isDirty && !confirm('미저장 변경이 있습니다. 무시하고 전환할까요?')) {
+    document.getElementById('stageSelect').selectedIndex = currentFileIndex;
+    return;
+  }
+  loadStageByIndex(parseInt(e.target.value));
+});
+
+// 저장 (PUT)
+document.getElementById('btnSave').addEventListener('click', async () => {
+  if (!currentFileName) return;
+  const data = gridToJson();
+  try {
+    const res = await fetch(API_LEVELS + currentFileName, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data, null, 2)
+    });
+    if (!res.ok) throw new Error(res.statusText);
+    stageFiles[currentFileIndex].data = data;
+    isDirty = false;
+    showToast('Saved!');
+  } catch (e) { showToast('Save failed: ' + e.message); }
+});
+
+// 새 스테이지 (PUT으로 생성)
+document.getElementById('btnNew').addEventListener('click', async () => {
+  const nums = stageFiles.map(f => parseInt(f.name.match(/\d+/)[0]));
+  const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
+  const name = `level_${next}.json`;
+  const defaultData = { ball_speed: 400, initial_balls: 50, star_thresholds: [10, 7, 4], bricks: [], ball_items: [] };
+  try {
+    await fetch(API_LEVELS + name, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(defaultData, null, 2)
+    });
+    stageFiles.push({ name, data: defaultData });
+    populateDropdown();
+    loadStageByIndex(stageFiles.length - 1);
+    showToast('Created ' + name);
+  } catch (e) { showToast('Create failed: ' + e.message); }
+});
+
+// 삭제 (DELETE)
+document.getElementById('btnDelete').addEventListener('click', async () => {
+  if (!currentFileName) return;
+  if (!confirm(`${currentFileName}을(를) 삭제할까요?`)) return;
+  try {
+    await fetch(API_LEVELS + currentFileName, { method: 'DELETE' });
+    stageFiles.splice(currentFileIndex, 1);
+    populateDropdown();
+    if (stageFiles.length > 0) loadStageByIndex(0);
+    else { initGrid(); render(); currentFileName = ''; }
+    showToast('Deleted!');
+  } catch (e) { showToast('Delete failed: ' + e.message); }
+});
+
+// ===== Keyboard shortcuts =====
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === '1') { currentTool = 'rect'; updateToolUI(); }
+  if (e.key === '2') { currentTool = 'tri'; updateToolUI(); }
+  if (e.key === '3') { currentTool = 'ball'; updateToolUI(); }
+  if (e.key === '4' || e.key === 'e') { currentTool = 'eraser'; updateToolUI(); }
+  if (e.key === 'Escape') clearSelection();
+  if (e.key === 'Delete' && selectedCell) {
+    grid[selectedCell.row][selectedCell.col] = null;
+    markDirty(); clearSelection();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    document.getElementById('btnSave').click();
+  }
+});
+
+function updateToolUI() {
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.toggle('active', b.dataset.tool === currentTool));
+}
+
+// ===== Init =====
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+loadLevelsFromServer();
+</script>
+</body>
+</html>

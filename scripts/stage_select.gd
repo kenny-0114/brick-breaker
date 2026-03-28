@@ -5,7 +5,7 @@ extends Control
 const TOTAL_LEVELS := 5
 
 var star_tex := preload("res://assets/images/ui/star.png")
-var star_outline_tex := preload("res://assets/images/ui/star_outline.png")
+var star_outline_tex := preload("res://assets/images/ui/star_grey.png")
 var _font := preload("res://assets/fonts/Kenney Future.ttf")
 
 @onready var stage_grid: GridContainer = $VBoxContainer/StageGrid
@@ -28,21 +28,27 @@ func _build_stage_buttons() -> void:
 		stage_grid.add_child(btn)
 
 
-# 개별 스테이지 버튼을 생성한다. 숫자와 별이 버튼 안에 함께 배치된다.
+# 개별 스테이지 버튼을 생성한다. Kenney UI NinePatch 카드로 배치된다.
 func _create_stage_button(level: int, is_unlocked: bool, stars_data: Dictionary) -> Control:
-	# 버튼 스타일
-	var style_unlocked := StyleBoxFlat.new()
-	style_unlocked.bg_color = Color(0.31, 0.66, 0.87, 1)
-	style_unlocked.set_corner_radius_all(12)
-	style_unlocked.shadow_color = Color(0.17, 0.38, 0.5, 1)
-	style_unlocked.shadow_size = 3
-	style_unlocked.shadow_offset = Vector2(0, 3)
+	# Kenney NinePatch 텍스처 버튼 스타일
+	var tex_green := preload("res://assets/images/ui/btn_green.png")
+	var tex_grey := preload("res://assets/images/ui/btn_grey.png")
+	var tex_yellow := preload("res://assets/images/ui/btn_yellow.png")
 
-	var style_locked := StyleBoxFlat.new()
-	style_locked.bg_color = Color(0.17, 0.17, 0.29, 1)
-	style_locked.set_corner_radius_all(12)
-	style_locked.border_color = Color(0.2, 0.2, 0.3, 1)
-	style_locked.set_border_width_all(2)
+	var style_unlocked := StyleBoxTexture.new()
+	style_unlocked.texture = tex_green
+	style_unlocked.texture_margin_left = 12.0
+	style_unlocked.texture_margin_top = 12.0
+	style_unlocked.texture_margin_right = 12.0
+	style_unlocked.texture_margin_bottom = 16.0
+
+	var style_locked := StyleBoxTexture.new()
+	style_locked.texture = tex_grey
+	style_locked.texture_margin_left = 12.0
+	style_locked.texture_margin_top = 12.0
+	style_locked.texture_margin_right = 12.0
+	style_locked.texture_margin_bottom = 16.0
+	style_locked.modulate_color = Color(1, 1, 1, 0.4)
 
 	# 버튼 — 정사각형 고정 크기, 내부 컨텐츠를 직접 배치
 	var btn := Button.new()
@@ -84,9 +90,11 @@ func _create_stage_button(level: int, is_unlocked: bool, stars_data: Dictionary)
 	if is_unlocked:
 		num_label.text = str(level)
 		num_label.add_theme_color_override("font_color", Color.WHITE)
+		num_label.add_theme_color_override("font_outline_color", Color(0.15, 0.4, 0.18, 1))
+		num_label.add_theme_constant_override("outline_size", 3)
 	else:
 		num_label.text = "🔒"
-		num_label.add_theme_color_override("font_color", Color(0.4, 0.4, 0.5, 1))
+		num_label.add_theme_color_override("font_color", Color(0.5, 0.65, 0.8, 0.5))
 	inner.add_child(num_label)
 
 	# 별 표시 — 고정 크기 14x14, expand_mode로 축소 강제

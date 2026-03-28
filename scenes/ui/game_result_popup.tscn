@@ -1,0 +1,260 @@
+[gd_scene format=3 uid="uid://dxeq35atc76en"]
+
+[ext_resource type="Script" uid="uid://bk0p6tlv11hnq" path="res://scripts/game_over_menu.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://byej6arf4bvww" path="res://assets/fonts/Kenney Future.ttf" id="2_font"]
+[ext_resource type="Texture2D" uid="uid://x0rk5s8rxsp7" path="res://assets/images/ui/panel_bg.png" id="3_panel"]
+[ext_resource type="Texture2D" uid="uid://dw651n25spcws" path="res://assets/images/ui/btn_blue.png" id="4_btn_blue"]
+[ext_resource type="Texture2D" uid="uid://2lhe1ncgndlo" path="res://assets/images/ui/star.png" id="5_star"]
+[ext_resource type="Texture2D" uid="uid://dwnkjds4tc3ws" path="res://assets/images/ui/btn_round_green.png" id="7_round_green"]
+[ext_resource type="Texture2D" uid="uid://ds8ooqkbxyjlj" path="res://assets/images/ui/btn_round_yellow.png" id="8_round_yellow"]
+[ext_resource type="Texture2D" uid="uid://dp4q4p0mujsco" path="res://assets/images/ui/btn_round_grey.png" id="9_round_grey"]
+[ext_resource type="Texture2D" uid="uid://bjhiakmh56iby" path="res://assets/images/ui/icon_home.png" id="10_icon_home"]
+[ext_resource type="Texture2D" uid="uid://dnxufuabxv3gk" path="res://assets/images/ui/icon_return.png" id="11_icon_return"]
+[ext_resource type="Texture2D" uid="uid://bt8ulrvklawny" path="res://assets/images/ui/icon_next.png" id="12_icon_next"]
+
+[sub_resource type="StyleBoxTexture" id="header_style"]
+content_margin_left = 16.0
+content_margin_top = 6.0
+content_margin_right = 16.0
+content_margin_bottom = 6.0
+texture = ExtResource("4_btn_blue")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxTexture" id="body_style"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+texture = ExtResource("3_panel")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[node name="GameResultPopup" type="CanvasLayer" unique_id=687460844]
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1612814776]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Root" type="Control" parent="." unique_id=266460341]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterBox" type="VBoxContainer" parent="Root" unique_id=1660562461]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -175.0
+offset_right = 140.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="Root/CenterBox" unique_id=963193024]
+layout_mode = 2
+theme_override_constants/margin_bottom = 15
+
+[node name="StarsRow" type="Control" parent="Root/CenterBox/MarginContainer" unique_id=2006651623]
+z_index = 10
+custom_minimum_size = Vector2(280, 60)
+layout_mode = 2
+
+[node name="StarCenter" type="TextureRect" parent="Root/CenterBox/MarginContainer/StarsRow" unique_id=940405664]
+custom_minimum_size = Vector2(74, 74)
+layout_mode = 0
+offset_left = 103.0
+offset_top = -7.0
+offset_right = 177.0
+offset_bottom = 67.0
+pivot_offset = Vector2(37, 37)
+texture = ExtResource("5_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StarLeft" type="TextureRect" parent="Root/CenterBox/MarginContainer/StarsRow" unique_id=522305888]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 0
+offset_left = 60.0
+offset_top = 10.0
+offset_right = 116.0
+offset_bottom = 66.0
+rotation = -0.26
+pivot_offset = Vector2(28, 28)
+texture = ExtResource("5_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StarRight" type="TextureRect" parent="Root/CenterBox/MarginContainer/StarsRow" unique_id=2138271192]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 0
+offset_left = 165.0
+offset_top = 10.0
+offset_right = 215.0
+offset_bottom = 60.0
+rotation = 0.26
+pivot_offset = Vector2(25, 25)
+texture = ExtResource("5_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HeaderMargin" type="MarginContainer" parent="Root/CenterBox" unique_id=1139283707]
+layout_mode = 2
+theme_override_constants/margin_top = -30
+
+[node name="HeaderPanel" type="Panel" parent="Root/CenterBox/HeaderMargin" unique_id=977639590]
+custom_minimum_size = Vector2(280, 70)
+layout_mode = 2
+theme_override_styles/panel = SubResource("header_style")
+
+[node name="TitleLabel" type="Label" parent="Root/CenterBox/HeaderMargin/HeaderPanel" unique_id=483329637]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 22
+text = "STAGE CLEAR!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BodyPanel" type="Panel" parent="Root/CenterBox" unique_id=243524613]
+custom_minimum_size = Vector2(280, 80)
+layout_mode = 2
+theme_override_styles/panel = SubResource("body_style")
+
+[node name="VBox" type="VBoxContainer" parent="Root/CenterBox/BodyPanel" unique_id=248720885]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="TurnLabel" type="Label" parent="Root/CenterBox/BodyPanel/VBox" unique_id=1496788846]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "Turn"
+horizontal_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="Root/CenterBox/BodyPanel/VBox" unique_id=1540459500]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.78, 0.17, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 28
+text = "0"
+horizontal_alignment = 1
+
+[node name="ButtonSpacer" type="Control" parent="Root/CenterBox" unique_id=1959970489]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="ButtonRow" type="HBoxContainer" parent="Root/CenterBox" unique_id=1207647693]
+layout_mode = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="BackBtn" type="TextureButton" parent="Root/CenterBox/ButtonRow" unique_id=239397980]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+texture_normal = ExtResource("9_round_grey")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Icon" type="TextureRect" parent="Root/CenterBox/ButtonRow/BackBtn" unique_id=1019297454]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -13.0
+offset_top = -15.0
+offset_right = 13.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("10_icon_home")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RetryBtn" type="TextureButton" parent="Root/CenterBox/ButtonRow" unique_id=2146834559]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+texture_normal = ExtResource("8_round_yellow")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Icon" type="TextureRect" parent="Root/CenterBox/ButtonRow/RetryBtn" unique_id=392933242]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -13.0
+offset_top = -15.0
+offset_right = 13.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("11_icon_return")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NextBtn" type="TextureButton" parent="Root/CenterBox/ButtonRow" unique_id=1344701409]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+texture_normal = ExtResource("7_round_green")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Icon" type="TextureRect" parent="Root/CenterBox/ButtonRow/NextBtn" unique_id=1990889336]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -18.0
+offset_right = 16.0
+offset_bottom = 14.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("12_icon_next")
+expand_mode = 1
+stretch_mode = 5
+
+[connection signal="pressed" from="Root/CenterBox/ButtonRow/BackBtn" to="." method="_on_stage_select_pressed"]
+[connection signal="pressed" from="Root/CenterBox/ButtonRow/RetryBtn" to="." method="_on_retry_pressed"]
+[connection signal="pressed" from="Root/CenterBox/ButtonRow/NextBtn" to="." method="_on_next_pressed"]

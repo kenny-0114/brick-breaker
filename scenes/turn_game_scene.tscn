@@ -1,13 +1,19 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene format=3 uid="uid://byx8w5kkec0il"]
 
-[ext_resource type="Script" path="res://scripts/turn_game_scene.gd" id="1_game"]
-[ext_resource type="Script" path="res://scripts/hud.gd" id="2_hud"]
-[ext_resource type="Script" path="res://scripts/pause_menu.gd" id="3_pause"]
-[ext_resource type="Script" path="res://scripts/game_over_menu.gd" id="4_gameover"]
+[ext_resource type="Script" uid="uid://dhbwcurvkgl3p" path="res://scripts/turn_game_scene.gd" id="1_game"]
+[ext_resource type="Script" uid="uid://cyty4cckvo3u3" path="res://scripts/hud.gd" id="2_hud"]
+[ext_resource type="Script" uid="uid://dhbvhxa3kup84" path="res://scripts/pause_menu.gd" id="3_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/game_result_popup.tscn" id="4_gameover_scene"]
 [ext_resource type="PackedScene" path="res://scenes/objects/launcher.tscn" id="5_launcher"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_popup.tscn" id="6_settings"]
-[ext_resource type="FontFile" path="res://assets/fonts/Kenney Future.ttf" id="7_font"]
-[ext_resource type="FontFile" path="res://assets/fonts/Kenney Future Narrow.ttf" id="8_font_narrow"]
+[ext_resource type="FontFile" uid="uid://byej6arf4bvww" path="res://assets/fonts/Kenney Future.ttf" id="7_font"]
+[ext_resource type="FontFile" uid="uid://bnp5pf7xs31ce" path="res://assets/fonts/Kenney Future Narrow.ttf" id="8_font_narrow"]
+[ext_resource type="Texture2D" uid="uid://7dofd13ret46" path="res://assets/images/ui/btn_green.png" id="9_btn_green"]
+[ext_resource type="Texture2D" uid="uid://dw651n25spcws" path="res://assets/images/ui/btn_blue.png" id="10_btn_blue"]
+[ext_resource type="Texture2D" uid="uid://b7jy3rwvehpev" path="res://assets/images/ui/btn_grey.png" id="12_btn_grey"]
+[ext_resource type="Texture2D" uid="uid://x0rk5s8rxsp7" path="res://assets/images/ui/panel_bg.png" id="13_panel"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/star.png" id="14_star"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/icon_pause.png" id="15_icon_pause"]
 
 [sub_resource type="RectangleShape2D" id="wall_h"]
 size = Vector2(480, 20)
@@ -18,269 +24,313 @@ size = Vector2(20, 854)
 [sub_resource type="RectangleShape2D" id="floor_shape"]
 size = Vector2(480, 20)
 
-[sub_resource type="StyleBoxFlat" id="panel_style"]
-bg_color = Color(0.1, 0.12, 0.22, 0.95)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.4, 0.6, 0.5)
+[sub_resource type="StyleBoxTexture" id="hud_style"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+texture = ExtResource("10_btn_blue")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 16.0
 
-[sub_resource type="StyleBoxFlat" id="btn_style"]
-bg_color = Color(0.31, 0.66, 0.87, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+[sub_resource type="StyleBoxTexture" id="btn_blue"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+texture = ExtResource("10_btn_blue")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 16.0
 
-[node name="TurnGameScene" type="Node2D"]
+[sub_resource type="StyleBoxEmpty" id="btn_focus"]
+
+[sub_resource type="StyleBoxTexture" id="panel_style"]
+content_margin_left = 20.0
+content_margin_top = 16.0
+content_margin_right = 20.0
+content_margin_bottom = 16.0
+texture = ExtResource("13_panel")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="btn_green"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+texture = ExtResource("9_btn_green")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxTexture" id="btn_grey"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+texture = ExtResource("12_btn_grey")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 16.0
+
+[node name="TurnGameScene" type="Node2D" unique_id=491222733]
 script = ExtResource("1_game")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=970237536]
 offset_right = 480.0
 offset_bottom = 854.0
 color = Color(0.1, 0.1, 0.24, 1)
 
-[node name="WallTop" type="StaticBody2D" parent="."]
-position = Vector2(240, -10)
+[node name="CeilingWall" type="ColorRect" parent="." unique_id=648702574]
+offset_top = 78.0
+offset_right = 480.0
+offset_bottom = 82.0
+color = Color(0.3, 0.4, 0.6, 0.8)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallTop"]
+[node name="FloorWall" type="ColorRect" parent="." unique_id=1392003956]
+offset_top = 708.0
+offset_right = 480.0
+offset_bottom = 712.0
+color = Color(0.3, 0.4, 0.6, 0.8)
+
+[node name="LeftWall" type="ColorRect" parent="." unique_id=1572566280]
+offset_left = -2.0
+offset_top = 78.0
+offset_right = 1.0
+offset_bottom = 712.0
+color = Color(0.3, 0.4, 0.6, 0.6)
+
+[node name="RightWall" type="ColorRect" parent="." unique_id=14077923]
+offset_left = 479.0
+offset_top = 78.0
+offset_right = 482.0
+offset_bottom = 712.0
+color = Color(0.3, 0.4, 0.6, 0.6)
+
+[node name="WallTop" type="StaticBody2D" parent="." unique_id=657448088]
+position = Vector2(240, 68)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallTop" unique_id=1749587243]
 shape = SubResource("wall_h")
 
-[node name="WallLeft" type="StaticBody2D" parent="."]
+[node name="WallLeft" type="StaticBody2D" parent="." unique_id=91979079]
 position = Vector2(-10, 427)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallLeft"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallLeft" unique_id=1659339453]
 shape = SubResource("wall_v")
 
-[node name="WallRight" type="StaticBody2D" parent="."]
+[node name="WallRight" type="StaticBody2D" parent="." unique_id=1342741549]
 position = Vector2(490, 427)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight" unique_id=213553516]
 shape = SubResource("wall_v")
 
-[node name="Floor" type="Area2D" parent="."]
+[node name="Floor" type="Area2D" parent="." unique_id=933435151]
+position = Vector2(240, 718)
 collision_layer = 0
 collision_mask = 2
-position = Vector2(240, 820)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=92104820]
 shape = SubResource("floor_shape")
 
-[node name="Launcher" parent="." instance=ExtResource("5_launcher")]
-position = Vector2(0, 800)
+[node name="Launcher" parent="." unique_id=1305654358 instance=ExtResource("5_launcher")]
+position = Vector2(0, 708)
 
-[node name="BrickContainer" type="Node2D" parent="."]
+[node name="BrickContainer" type="Node2D" parent="." unique_id=339021908]
 
-[node name="ItemContainer" type="Node2D" parent="."]
+[node name="ItemContainer" type="Node2D" parent="." unique_id=2001313194]
 
-[node name="BallContainer" type="Node2D" parent="."]
+[node name="BallContainer" type="Node2D" parent="." unique_id=2095272638]
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=368528292]
 script = ExtResource("2_hud")
 
-[node name="MarginContainer" type="MarginContainer" parent="HUD"]
+[node name="HUDPanel" type="Panel" parent="HUD" unique_id=324670053]
 anchors_preset = 10
 anchor_right = 1.0
+offset_bottom = 76.0
 grow_horizontal = 2
-offset_bottom = 44.0
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
+theme_override_styles/panel = SubResource("hud_style")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MarginContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="HUD" unique_id=81363460]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 70.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 14
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MarginContainer" unique_id=1753937564]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="TurnLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer"]
+[node name="TurnLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer" unique_id=112245087]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.78, 0.17, 1)
 theme_override_fonts/font = ExtResource("8_font_narrow")
 theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(1, 0.84, 0, 1)
 text = "Turn: 0"
 
-[node name="LevelLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer"]
+[node name="ScoreIcon" type="TextureRect" parent="HUD/MarginContainer/HBoxContainer"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("8_font_narrow")
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.67, 0.67, 0.67, 1)
-text = "Level 1"
-horizontal_alignment = 1
+custom_minimum_size = Vector2(20, 20)
+texture = ExtResource("14_star")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="BallsLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer"]
+[node name="LevelLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer" unique_id=1515577720]
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.78, 0.17, 1)
 theme_override_fonts/font = ExtResource("8_font_narrow")
 theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(0.5, 0.85, 1.0, 1)
+text = "0"
+horizontal_alignment = 0
+
+[node name="BallsLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer" unique_id=386484529]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
+theme_override_fonts/font = ExtResource("8_font_narrow")
+theme_override_font_sizes/font_size = 16
 text = "Balls: 1"
 horizontal_alignment = 2
 
-[node name="PauseButton" type="Button" parent="HUD/MarginContainer/HBoxContainer"]
-layout_mode = 2
+[node name="PauseButton" type="Button" parent="HUD/MarginContainer/HBoxContainer" unique_id=1827652992]
 custom_minimum_size = Vector2(36, 36)
-theme_override_fonts/font = ExtResource("8_font_narrow")
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-text = "| |"
+layout_mode = 2
+theme_override_styles/normal = SubResource("btn_blue")
+theme_override_styles/pressed = SubResource("btn_blue")
+theme_override_styles/hover = SubResource("btn_blue")
+theme_override_styles/focus = SubResource("btn_focus")
+text = ""
 
-[node name="PauseMenu" type="CanvasLayer" parent="."]
+[node name="Icon" type="TextureRect" parent="HUD/MarginContainer/HBoxContainer/PauseButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -10.0
+offset_top = -12.0
+offset_right = 10.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("15_icon_pause")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="BottomPanel" type="Panel" parent="HUD"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -142.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("hud_style")
+
+[node name="PauseMenu" type="CanvasLayer" parent="." unique_id=297926061]
 process_mode = 3
 script = ExtResource("3_pause")
 
-[node name="Panel" type="Panel" parent="PauseMenu"]
+[node name="Dimmer" type="ColorRect" parent="PauseMenu" unique_id=589730518]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Panel" type="Panel" parent="PauseMenu" unique_id=1632835]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -130.0
-offset_top = -110.0
-offset_right = 130.0
-offset_bottom = 110.0
+offset_left = -140.0
+offset_top = -130.0
+offset_right = 140.0
+offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("panel_style")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PauseMenu/Panel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PauseMenu/Panel" unique_id=1966174975]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = 15.0
-offset_right = -20.0
-offset_bottom = -15.0
+offset_left = 10.0
+offset_top = 6.0
+offset_right = -10.0
+offset_bottom = -6.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 alignment = 1
 
-[node name="PauseLabel" type="Label" parent="PauseMenu/Panel/VBoxContainer"]
+[node name="PauseLabel" type="Label" parent="PauseMenu/Panel/VBoxContainer" unique_id=1983005665]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.27, 0.69, 0.9, 1)
 theme_override_fonts/font = ExtResource("7_font")
-theme_override_font_sizes/font_size = 24
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 26
 text = "PAUSED"
 horizontal_alignment = 1
 
-[node name="ResumeButton" type="Button" parent="PauseMenu/Panel/VBoxContainer"]
+[node name="ResumeButton" type="Button" parent="PauseMenu/Panel/VBoxContainer" unique_id=843958227]
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-custom_minimum_size = Vector2(0, 38)
-theme_override_fonts/font = ExtResource("7_font")
-theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("btn_style")
-theme_override_styles/hover = SubResource("btn_style")
-theme_override_styles/pressed = SubResource("btn_style")
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("btn_green")
+theme_override_styles/pressed = SubResource("btn_green")
+theme_override_styles/hover = SubResource("btn_green")
+theme_override_styles/focus = SubResource("btn_focus")
 text = "Resume"
 
-[node name="SettingsButton" type="Button" parent="PauseMenu/Panel/VBoxContainer"]
+[node name="SettingsButton" type="Button" parent="PauseMenu/Panel/VBoxContainer" unique_id=78059657]
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-custom_minimum_size = Vector2(0, 38)
-theme_override_fonts/font = ExtResource("7_font")
-theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("btn_style")
-theme_override_styles/hover = SubResource("btn_style")
-theme_override_styles/pressed = SubResource("btn_style")
+theme_override_fonts/font = ExtResource("7_font")
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("btn_blue")
+theme_override_styles/pressed = SubResource("btn_blue")
+theme_override_styles/hover = SubResource("btn_blue")
+theme_override_styles/focus = SubResource("btn_focus")
 text = "Settings"
 
-[node name="StageSelectButton" type="Button" parent="PauseMenu/Panel/VBoxContainer"]
+[node name="StageSelectButton" type="Button" parent="PauseMenu/Panel/VBoxContainer" unique_id=692237872]
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-custom_minimum_size = Vector2(0, 38)
+theme_override_colors/font_color = Color(0.4, 0.4, 0.45, 1)
 theme_override_fonts/font = ExtResource("7_font")
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("btn_style")
-theme_override_styles/hover = SubResource("btn_style")
-theme_override_styles/pressed = SubResource("btn_style")
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("btn_grey")
+theme_override_styles/pressed = SubResource("btn_grey")
+theme_override_styles/hover = SubResource("btn_grey")
+theme_override_styles/focus = SubResource("btn_focus")
 text = "Stage Select"
 
-[node name="SettingsPopup" parent="PauseMenu" instance=ExtResource("6_settings")]
+[node name="SettingsPopup" parent="PauseMenu" unique_id=190827502 instance=ExtResource("6_settings")]
 
-[node name="GameOverMenu" type="CanvasLayer" parent="."]
-process_mode = 3
-script = ExtResource("4_gameover")
-
-[node name="Panel" type="Panel" parent="GameOverMenu"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -150.0
-offset_top = -140.0
-offset_right = 150.0
-offset_bottom = 140.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("panel_style")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="GameOverMenu/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = 15.0
-offset_right = -20.0
-offset_bottom = -15.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 12
-alignment = 1
-
-[node name="TitleLabel" type="Label" parent="GameOverMenu/Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("7_font")
-theme_override_font_sizes/font_size = 26
-theme_override_colors/font_color = Color(0.91, 0.27, 0.38, 1)
-text = "GAME OVER"
-horizontal_alignment = 1
-
-[node name="ScoreLabel" type="Label" parent="GameOverMenu/Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("8_font_narrow")
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(1, 0.84, 0, 1)
-text = "Turn: 0"
-horizontal_alignment = 1
-
-[node name="StarsContainer" type="HBoxContainer" parent="GameOverMenu/Panel/VBoxContainer"]
-layout_mode = 2
-alignment = 1
-
-[node name="RetryButton" type="Button" parent="GameOverMenu/Panel/VBoxContainer"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 38)
-theme_override_fonts/font = ExtResource("7_font")
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("btn_style")
-theme_override_styles/hover = SubResource("btn_style")
-theme_override_styles/pressed = SubResource("btn_style")
-text = "Retry"
-
-[node name="StageSelectButton" type="Button" parent="GameOverMenu/Panel/VBoxContainer"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 38)
-theme_override_fonts/font = ExtResource("7_font")
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("btn_style")
-theme_override_styles/hover = SubResource("btn_style")
-theme_override_styles/pressed = SubResource("btn_style")
-text = "Stage Select"
+[node name="GameOverMenu" parent="." instance=ExtResource("4_gameover_scene")]
 
 [connection signal="pressed" from="HUD/MarginContainer/HBoxContainer/PauseButton" to="HUD" method="_on_pause_pressed"]
 [connection signal="pressed" from="PauseMenu/Panel/VBoxContainer/ResumeButton" to="PauseMenu" method="_on_resume_pressed"]
 [connection signal="pressed" from="PauseMenu/Panel/VBoxContainer/SettingsButton" to="PauseMenu" method="_on_settings_pressed"]
 [connection signal="pressed" from="PauseMenu/Panel/VBoxContainer/StageSelectButton" to="PauseMenu" method="_on_stage_select_pressed"]
-[connection signal="pressed" from="GameOverMenu/Panel/VBoxContainer/RetryButton" to="GameOverMenu" method="_on_retry_pressed"]
-[connection signal="pressed" from="GameOverMenu/Panel/VBoxContainer/StageSelectButton" to="GameOverMenu" method="_on_stage_select_pressed"]

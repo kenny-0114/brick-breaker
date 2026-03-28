@@ -8,11 +8,11 @@ signal all_balls_fired
 signal aiming_started
 signal aiming_ended
 
-const FIRE_INTERVAL := 0.05
+const FIRE_INTERVAL := 0.08
 const MIN_AIM_ANGLE := deg_to_rad(10.0)
 const MAX_AIM_ANGLE := deg_to_rad(170.0)
 const DOT_SPACING := 20.0
-const DOT_SCALE := Vector2(0.06, 0.06)
+const DOT_SCALE := Vector2(0.12, 0.12)
 const MAX_DOTS := 60
 const RAY_LENGTH := 2000.0
 
@@ -23,7 +23,7 @@ var _ball_scene: PackedScene = null
 var _ball_speed: float = 400.0
 var _ball_container: Node2D = null
 var _dot_pool: Array[Sprite2D] = []
-var _ball_texture: Texture2D = preload("res://assets/images/ball/ballBlue_01.png")
+var _ball_texture: Texture2D = preload("res://assets/images/ball/ball_blue_large.png")
 
 @onready var launch_point: Marker2D = $LaunchPoint
 @onready var fire_timer: Timer = $FireTimer

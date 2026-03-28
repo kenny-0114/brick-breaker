@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/objects/ball.gd" id="1_ball"]
-[ext_resource type="Texture2D" path="res://assets/images/ball/ballBlue_01.png" id="2_ball"]
+[ext_resource type="Texture2D" path="res://assets/images/ball/ball_blue_large.png" id="2_ball"]
 
 [sub_resource type="PhysicsMaterial" id="SubResource_phys"]
 bounce = 1.0
@@ -21,7 +21,7 @@ max_contacts_reported = 4
 script = ExtResource("1_ball")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.11, 0.11)
+scale = Vector2(0.22, 0.22)
 texture = ExtResource("2_ball")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

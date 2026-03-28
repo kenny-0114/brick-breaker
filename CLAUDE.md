@@ -41,6 +41,23 @@ AIMING → FIRING → WAITING → TURN_END → AIMING
 
 Floor(Area2D)와 BallItem(Area2D)은 `collision_mask=2`로 공만 감지.
 
+### 화면 레이아웃 (480×854)
+```
+  0px ┌────────────────────────────┐
+      │      TOP HUD (68px)        │
+ 68px ├════════════════════════════╡ ← 천정벽 (4px, ColorRect)
+      ║                            ║
+      ║      PLAY AREA (676px)     ║ ← 옆벽 (4px, ColorRect)
+      ║                            ║
+748px ╠════════════════════════════╣ ← 바닥벽 (4px, ColorRect)
+      │   BOTTOM AREA (102px)      │
+854px └────────────────────────────┘
+```
+- 벽 시각: CeilingWall, FloorWall, LeftWall, RightWall (ColorRect, Color(0.3, 0.4, 0.6, 0.8))
+- 벽 물리: WallTop(StaticBody2D, Y=58), WallLeft(X=-10), WallRight(X=490)
+- GRID_TOP_OFFSET=84, FLOOR_Y=744, Floor Area2D(Y=764)
+- GRID_COLS=10, 정사각형 셀 (cell_height = cell_width = 48px)
+
 ### 벽돌 시스템 (brick.gd)
 - **사각형**: Sprite2D + RectangleShape2D, Kenney 텍스처
 - **직각삼각형**: Polygon2D + CollisionPolygon2D, 단색 채움. 4방향 (dir 0:◣ 1:◢ 2:◤ 3:◥)

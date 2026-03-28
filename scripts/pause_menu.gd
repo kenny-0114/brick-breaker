@@ -2,10 +2,12 @@
 # 일시정지 메뉴. 재개, 설정, 스테이지 선택 버튼을 제공한다.
 extends CanvasLayer
 
+@onready var dimmer: ColorRect = $Dimmer
 @onready var panel: Control = $Panel
 
 
 func _ready() -> void:
+	dimmer.visible = false
 	panel.visible = false
 
 
@@ -18,6 +20,7 @@ func _input(event: InputEvent) -> void:
 func toggle_pause() -> void:
 	var is_paused := not get_tree().paused
 	get_tree().paused = is_paused
+	dimmer.visible = is_paused
 	panel.visible = is_paused
 
 

@@ -3,8 +3,7 @@
 # 물리 엔진(bounce=1.0)이 반사를 처리하고, 충돌 후 속도 정규화와 각도 보정만 수행한다.
 extends RigidBody2D
 
-const MIN_ANGLE_RAD := deg_to_rad(15.0)
-const MAX_ANGLE_RAD := deg_to_rad(165.0)
+const MIN_ANGLE_RAD := deg_to_rad(8.0)
 const TRAIL_MIN := 12
 const TRAIL_MAX := 35
 
@@ -58,26 +57,23 @@ func _physics_process(_delta: float) -> void:
 func _on_body_entered(body: Node) -> void:
 	if body.has_method("hit"):
 		body.hit()
+		SoundManager.play_sfx(SoundManager.sfx_ball_hit)
 	# 물리 엔진이 반사한 뒤 다음 프레임에서 속도를 보정한다.
 	_correct_velocity.call_deferred()
 
 
-# 속도 정규화 + 각도 보정을 한 번에 수행한다.
+# 수직에 가까운 상향 이동만 보정한다. 하향은 바닥 회수되므로 보정 불필요.
 func _correct_velocity() -> void:
 	var vel := linear_velocity
 	var speed := vel.length()
 	if speed < 1.0:
 		return
 	var dir := vel / speed
-	var angle := absf(dir.angle_to(Vector2.UP))
-	if angle < MIN_ANGLE_RAD:
+	var angle_from_up := absf(dir.angle_to(Vector2.UP))
+	if angle_from_up < MIN_ANGLE_RAD:
+		# 거의 수직 상향 → 최소 각도만큼 옆으로 틀어 무한 바운스를 방지
 		var sign_x: float = signf(dir.x) if dir.x != 0.0 else 1.0
-		dir.x = abs(dir.y) * tan(MIN_ANGLE_RAD) * sign_x
-		dir = dir.normalized()
-	elif angle > MAX_ANGLE_RAD:
-		var sign_y: float = signf(dir.y) if dir.y != 0.0 else -1.0
-		dir.y = abs(dir.x) * tan(MIN_ANGLE_RAD) * sign_y
-		dir = dir.normalized()
+		dir = Vector2(sin(MIN_ANGLE_RAD) * sign_x, -cos(MIN_ANGLE_RAD))
 	linear_velocity = dir * _target_speed
 
 

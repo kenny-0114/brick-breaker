@@ -7,11 +7,11 @@ enum State { AIMING, FIRING, WAITING, TURN_END }
 const BALL_SCENE := preload("res://scenes/objects/ball.tscn")
 const BRICK_SCENE := preload("res://scenes/objects/brick.tscn")
 const BALL_ITEM_SCENE := preload("res://scenes/objects/ball_item.tscn")
-const GRID_COLS := 7
+const GRID_COLS := 10
 const BRICK_MARGIN := 0.0
-const GRID_TOP_OFFSET := 80.0
+const GRID_TOP_OFFSET := 84.0
 const DESCEND_DURATION := 0.3
-const FLOOR_Y := 800.0
+const FLOOR_Y := 708.0
 const SPEED_RAMP_DELAY_1 := 5.0
 const SPEED_RAMP_DELAY_2 := 10.0
 const SPEED_STAGE_1 := 2.0
@@ -94,7 +94,7 @@ func _load_level(level: int) -> void:
 
 	var viewport_width := get_viewport_rect().size.x
 	var cell_width := viewport_width / GRID_COLS
-	var cell_height := cell_width * 0.5
+	var cell_height := cell_width
 	_cell_height = cell_height
 
 	# 벽돌 배치
@@ -108,7 +108,7 @@ func _load_level(level: int) -> void:
 		var brick_type: String = str(brick_data.get("type", "rect"))
 		brick.position = Vector2(
 			(col + 0.5) * cell_width,
-			GRID_TOP_OFFSET + row * cell_height
+			GRID_TOP_OFFSET + (row + 0.5) * cell_height
 		)
 		brick_container.add_child(brick)
 		if brick_type == "tri":
@@ -135,7 +135,7 @@ func _load_level(level: int) -> void:
 		var col: int = int(item_data["col"])
 		item.position = Vector2(
 			(col + 0.5) * cell_width,
-			GRID_TOP_OFFSET + row * cell_height
+			GRID_TOP_OFFSET + (row + 0.5) * cell_height
 		)
 		item_container.add_child(item)
 		item.collected.connect(_on_ball_item_collected)
@@ -146,12 +146,13 @@ func _load_level(level: int) -> void:
 	launcher.set_launch_x(_first_ball_x)
 
 
-# 조준 상태로 전환한다.
+# 조준 상태로 전환한다. 콤보를 리셋한다.
 func _start_aiming() -> void:
 	_state = State.AIMING
 	_balls_collected = 0
 	_balls_returned = 0
 	_first_ball_landed = false
+	GameManager.reset_combo()
 	_hide_landing_indicator()
 	_show_launch_indicator()
 	launcher.set_launch_x(_first_ball_x)
@@ -175,9 +176,11 @@ func _on_all_balls_fired() -> void:
 	_stuck_timer.start()
 
 
-# 공이 바닥에 닿았을 때 호출된다.
+# 공이 바닥에 닿았을 때 호출된다. 위로 올라가는 공은 무시한다.
 func _on_floor_body_entered(body: Node2D) -> void:
 	if not body.is_in_group("ball"):
+		return
+	if body is RigidBody2D and body.linear_velocity.y < 0:
 		return
 	# 첫 번째 공의 X 위치를 다음 턴 발사 지점으로 저장
 	if not _first_ball_landed:
@@ -187,7 +190,7 @@ func _on_floor_body_entered(body: Node2D) -> void:
 	# 회수 카운터 증가 및 표시 갱신
 	_balls_returned += 1
 	_update_landing_indicator()
-	# 공을 발사 지점으로 이동 후 제거
+	# 공을 바닥 라인에서 수평 이동 후 제거
 	var tween := create_tween()
 	body.freeze = true
 	tween.tween_property(body, "global_position", Vector2(_first_ball_x, FLOOR_Y), 0.15)
@@ -256,10 +259,45 @@ func _check_game_over() -> bool:
 	return false
 
 
-# 벽돌 파괴 시 호출된다.
+# 벽돌 파괴 시 호출된다. 점수를 추가하고 팝업을 표시한다.
 func _on_brick_destroyed(pos: Vector2) -> void:
 	_remaining_bricks -= 1
+	var points := GameManager.add_brick_score()
 	_spawn_particles(pos)
+	_spawn_score_popup(pos, points, GameManager.combo)
+	if _remaining_bricks <= 0 and (_state == State.WAITING or _state == State.FIRING):
+		_recall_all_balls.call_deferred()
+
+
+# 스테이지 클리어 시 모든 공을 즉시 회수 지점으로 직선 이동시킨다.
+func _recall_all_balls() -> void:
+	_stuck_timer.stop()
+	launcher.fire_timer.stop()
+	# 첫 번째 착지 기록이 없으면 현재 위치 기준으로 설정
+	if not _first_ball_landed:
+		_first_ball_landed = true
+		if ball_container.get_child_count() > 0:
+			_first_ball_x = clampf(ball_container.get_child(0).global_position.x, 20.0, 460.0)
+	var target := Vector2(_first_ball_x, FLOOR_Y)
+	var balls := ball_container.get_children().duplicate()
+	if balls.is_empty():
+		return
+	# 바닥 감지 방지를 위해 그룹 제거 후 물리 정지
+	for ball in balls:
+		ball.remove_from_group("ball")
+		ball.freeze = true
+	# 모든 공을 동시에 회수 지점으로 직선 이동
+	var tween := create_tween().set_parallel(true)
+	for ball in balls:
+		tween.tween_property(ball, "global_position", target, 0.15)
+	await tween.finished
+	# 공 제거 후 턴 종료
+	for ball in balls:
+		if is_instance_valid(ball):
+			ball.queue_free()
+	await get_tree().process_frame
+	if _state == State.WAITING or _state == State.FIRING:
+		_end_turn()
 
 
 # 공 아이템 수집 시 호출된다.
@@ -288,9 +326,39 @@ func _spawn_particles(pos: Vector2) -> void:
 	particles.amount = 6
 	particles.lifetime = 0.6
 	particles.process_material = mat
-	particles.texture = preload("res://assets/images/bricks/tileGreen_01.png")
+	particles.texture = preload("res://assets/images/bricks/tile_brick_white.png")
 	add_child(particles)
 	particles.finished.connect(particles.queue_free)
+
+
+# 블럭 파괴 위치에 점수 팝업을 표시한다. 콤보가 높을수록 크고 밝다.
+func _spawn_score_popup(pos: Vector2, points: int, combo: int) -> void:
+	var label := Label.new()
+	label.text = "+%d" % points
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.position = pos - Vector2(30, 15)
+	label.size = Vector2(60, 30)
+	# 콤보에 따라 크기와 색상 변화
+	var font_size := clampi(14 + combo * 2, 14, 28)
+	var color := Color(1.0, 1.0, 1.0)
+	if combo >= 10:
+		color = Color(1.0, 0.3, 0.3)  # 빨강
+	elif combo >= 5:
+		color = Color(1.0, 0.65, 0.15)  # 주황
+	elif combo >= 3:
+		color = Color(1.0, 0.85, 0.2)  # 노랑
+	label.add_theme_font_override("font", preload("res://assets/fonts/Kenney Future.ttf"))
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+	label.add_theme_constant_override("outline_size", 3)
+	add_child(label)
+	# 위로 떠오르며 사라짐
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(label, "position:y", pos.y - 50, 0.6).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "modulate:a", 0.0, 0.6).set_ease(Tween.EASE_IN).set_delay(0.2)
+	tween.chain().tween_callback(label.queue_free)
 
 
 # 발사 지점에 공 아이콘과 개수를 표시한다.
@@ -300,8 +368,8 @@ func _show_launch_indicator() -> void:
 	_launch_indicator.z_index = 100
 	_launch_indicator.position = Vector2(_first_ball_x, FLOOR_Y)
 	var icon := Sprite2D.new()
-	icon.texture = preload("res://assets/images/ball/ballBlue_01.png")
-	icon.scale = Vector2(0.12, 0.12)
+	icon.texture = preload("res://assets/images/ball/ball_blue_large.png")
+	icon.scale = Vector2(0.24, 0.24)
 	icon.position = Vector2(0, -10)
 	_launch_indicator.add_child(icon)
 	var label := Label.new()
@@ -331,8 +399,8 @@ func _create_landing_indicator() -> void:
 	_landing_indicator.z_index = 100
 	_landing_indicator.position = Vector2(_first_ball_x, FLOOR_Y)
 	var icon := Sprite2D.new()
-	icon.texture = preload("res://assets/images/ball/ballBlue_01.png")
-	icon.scale = Vector2(0.12, 0.12)
+	icon.texture = preload("res://assets/images/ball/ball_blue_large.png")
+	icon.scale = Vector2(0.24, 0.24)
 	icon.position = Vector2(0, -10)
 	_landing_indicator.add_child(icon)
 	var label := Label.new()
@@ -377,9 +445,11 @@ func _force_collect_balls() -> void:
 
 func _on_game_over() -> void:
 	Engine.time_scale = 1.0
+	await get_tree().create_timer(0.5).timeout
 	game_over_menu.show_game_over()
 
 
 func _on_stage_cleared() -> void:
 	Engine.time_scale = 1.0
+	await get_tree().create_timer(0.5).timeout
 	game_over_menu.show_clear()

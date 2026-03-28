@@ -1,28 +1,32 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/title_screen.gd" id="1_title"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_popup.tscn" id="2_settings"]
 [ext_resource type="FontFile" path="res://assets/fonts/Kenney Future.ttf" id="3_font"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/btn_green.png" id="4_btn_green"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/btn_grey.png" id="5_btn_grey"]
 
-[sub_resource type="StyleBoxFlat" id="btn_play"]
-bg_color = Color(0.31, 0.66, 0.87, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0.17, 0.38, 0.5, 1)
-shadow_size = 4
-shadow_offset = Vector2(0, 4)
+[sub_resource type="StyleBoxTexture" id="btn_play"]
+texture = ExtResource("4_btn_green")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 16.0
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
 
-[sub_resource type="StyleBoxFlat" id="btn_settings"]
-bg_color = Color(0.4, 0.4, 0.4, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0.27, 0.27, 0.27, 1)
-shadow_size = 3
-shadow_offset = Vector2(0, 3)
+[sub_resource type="StyleBoxTexture" id="btn_settings"]
+texture = ExtResource("5_btn_grey")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 16.0
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
 
 [sub_resource type="StyleBoxEmpty" id="btn_focus"]
 
@@ -42,7 +46,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.06, 0.13, 0.24, 1)
+color = Color(0.23, 0.56, 0.83, 1)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -51,28 +55,32 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -130.0
-offset_top = -120.0
-offset_right = 130.0
-offset_bottom = 120.0
+offset_left = -140.0
+offset_top = -140.0
+offset_right = 140.0
+offset_bottom = 140.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 alignment = 1
 
 [node name="TitleLabel1" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 42
-theme_override_colors/font_color = Color(0.91, 0.27, 0.38, 1)
+theme_override_font_sizes/font_size = 52
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.14, 0.35, 0.58, 1)
+theme_override_constants/outline_size = 4
 text = "BRICK"
 horizontal_alignment = 1
 
 [node name="TitleLabel2" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 42
-theme_override_colors/font_color = Color(0.91, 0.27, 0.38, 1)
+theme_override_font_sizes/font_size = 52
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.14, 0.35, 0.58, 1)
+theme_override_constants/outline_size = 4
 text = "BREAKER"
 horizontal_alignment = 1
 
@@ -80,7 +88,7 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.67, 0.67, 0.67, 1)
+theme_override_colors/font_color = Color(0.82, 0.9, 0.98, 1)
 text = "A Classic Arcade Game"
 horizontal_alignment = 1
 
@@ -90,28 +98,29 @@ custom_minimum_size = Vector2(0, 50)
 
 [node name="PlayButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(200, 50)
+custom_minimum_size = Vector2(240, 56)
+size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_styles/normal = SubResource("btn_play")
 theme_override_styles/hover = SubResource("btn_play")
 theme_override_styles/pressed = SubResource("btn_play")
 theme_override_styles/focus = SubResource("btn_focus")
-text = "▶  PLAY"
+text = "PLAY"
 
 [node name="SettingsButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(160, 42)
+custom_minimum_size = Vector2(180, 44)
 size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 15
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.4, 0.4, 0.45, 1)
 theme_override_styles/normal = SubResource("btn_settings")
 theme_override_styles/hover = SubResource("btn_settings")
 theme_override_styles/pressed = SubResource("btn_settings")
 theme_override_styles/focus = SubResource("btn_focus")
-text = "⚙  Settings"
+text = "Settings"
 
 [node name="SettingsPopup" parent="." instance=ExtResource("2_settings")]
 

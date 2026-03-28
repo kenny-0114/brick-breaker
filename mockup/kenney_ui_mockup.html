@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Kenney UI NinePatch Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  h1 { font-size: 20px; letter-spacing: 2px; }
+  h2 { font-size: 14px; color: #aab; margin-bottom: 8px; }
+  .section { background: #12122a; border-radius: 12px; padding: 20px; max-width: 520px; width: 100%; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+
+  /* ===== NinePatch Button via CSS border-image ===== */
+  .k-btn {
+    border: none; cursor: pointer; color: #fff; font-weight: bold; font-size: 15px;
+    padding: 12px 28px; min-width: 160px; text-align: center;
+    /* NinePatch: 12px top, 12px right, 16px bottom (depth shadow), 12px left */
+    border-image-slice: 12 12 16 12 fill;
+    border-image-width: 12px 12px 16px 12px;
+    border-image-repeat: stretch;
+    border-style: solid; border-width: 0;
+    background: none;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    letter-spacing: 0.5px;
+  }
+  .k-btn:active { padding-top: 14px; padding-bottom: 10px; }
+  .k-btn-green { border-image-source: url('../kenney_ui-pack/PNG/Green/Default/button_rectangle_depth_flat.png'); }
+  .k-btn-blue { border-image-source: url('../kenney_ui-pack/PNG/Blue/Default/button_rectangle_depth_flat.png'); }
+  .k-btn-red { border-image-source: url('../kenney_ui-pack/PNG/Red/Default/button_rectangle_depth_flat.png'); }
+  .k-btn-grey { border-image-source: url('../kenney_ui-pack/PNG/Grey/Default/button_rectangle_depth_flat.png'); color: #555; text-shadow: none; }
+  .k-btn-yellow { border-image-source: url('../kenney_ui-pack/PNG/Yellow/Default/button_rectangle_depth_flat.png'); }
+
+  /* ===== NinePatch Panel ===== */
+  .k-panel {
+    border-image-source: url('../kenney_ui-pack/PNG/Extra/Default/input_rectangle.png');
+    border-image-slice: 12 12 12 12 fill;
+    border-image-width: 12px;
+    border-image-repeat: stretch;
+    border-style: solid; border-width: 0;
+    padding: 20px;
+    color: #444;
+  }
+  .k-panel-blue {
+    border-image-source: url('../kenney_ui-pack/PNG/Blue/Default/button_rectangle_depth_flat.png');
+    border-image-slice: 12 12 16 12 fill;
+    border-image-width: 12px 12px 16px 12px;
+    color: #fff;
+  }
+
+  /* ===== Phone Frame ===== */
+  .phone { width: 480px; height: 854px; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.5); position: relative; }
+  .phone-bg { position: absolute; inset: 0; }
+
+  /* Title screen */
+  .title-screen { background: #3a8fd4; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+  .title-text { font-size: 48px; font-weight: bold; color: #fff; text-shadow: 0 3px 0 #1a5a94; letter-spacing: 3px; line-height: 1.1; text-align: center; }
+  .title-sub { font-size: 13px; color: rgba(255,255,255,0.7); letter-spacing: 2px; }
+  .title-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 40px; align-items: center; }
+
+  /* Stage select */
+  .stage-screen { background: #3a8fd4; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; padding: 30px 20px; gap: 20px; }
+  .stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 320px; }
+  .stage-card { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
+  .stage-card .num { font-size: 26px; font-weight: bold; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+  .stage-card .stars { font-size: 12px; }
+
+  /* Game popups */
+  .game-bg { background: #16163a; width: 100%; height: 100%; position: relative; }
+  .dimmer { position: absolute; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; }
+  .popup { width: 300px; }
+  .popup-header { text-align: center; padding: 14px 20px; font-size: 22px; font-weight: bold; letter-spacing: 1px; }
+  .popup-body { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .popup-body .k-btn { width: 220px; }
+  .popup-body .score { font-size: 28px; font-weight: bold; color: #f5c52c; margin: 4px 0; }
+  .popup-body .score-label { font-size: 13px; color: #888; }
+  .popup-body .stars-row { font-size: 32px; margin: 4px 0; }
+
+  /* Settings */
+  .settings-row { width: 100%; }
+  .settings-row label { display: block; font-size: 12px; font-weight: bold; color: #666; margin-bottom: 4px; }
+  .settings-slider { width: 100%; height: 8px; border-radius: 4px; background: #ddd; appearance: none; }
+  .settings-slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #45b0e6; border: 3px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+
+  .nav-tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .nav-tab { padding: 8px 14px; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; color: #fff; background: #4a6fa5; }
+  .nav-tab:hover { background: #5a8fc5; }
+  .nav-tab.active { background: #4cc355; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .screen-label { text-align: center; font-size: 12px; color: #556; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<h1>Kenney UI NinePatch Mockup</h1>
+<p style="color:#556;font-size:12px;">실제 Kenney PNG 이미지를 CSS border-image (NinePatch)로 적용한 목업</p>
+
+<!-- ===== 에셋 프리뷰 ===== -->
+<div class="section">
+  <h2>1. NinePatch Buttons (실제 PNG)</h2>
+  <div class="row">
+    <button class="k-btn k-btn-green">PLAY</button>
+    <button class="k-btn k-btn-blue">Settings</button>
+  </div>
+  <div class="row">
+    <button class="k-btn k-btn-red">Retry</button>
+    <button class="k-btn k-btn-grey">Back</button>
+    <button class="k-btn k-btn-yellow">Next</button>
+  </div>
+  <h2 style="margin-top:16px;">2. NinePatch Panels</h2>
+  <div class="row">
+    <div class="k-panel" style="width:260px;">
+      <div style="text-align:center;font-weight:bold;font-size:16px;color:#555;margin-bottom:8px;">Panel (Light)</div>
+      <div style="font-size:12px;color:#888;">패널 배경으로 사용. NinePatch로 자유롭게 리사이즈 가능.</div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="k-panel k-panel-blue" style="width:260px;">
+      <div style="text-align:center;font-weight:bold;font-size:16px;">Panel (Blue Header)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 화면별 탭 ===== -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="show('title')">Title</button>
+  <button class="nav-tab" onclick="show('stage')">Stage Select</button>
+  <button class="nav-tab" onclick="show('game')">Game HUD</button>
+  <button class="nav-tab" onclick="show('pause')">Pause</button>
+  <button class="nav-tab" onclick="show('gameover')">Game Over</button>
+  <button class="nav-tab" onclick="show('clear')">Stage Clear</button>
+  <button class="nav-tab" onclick="show('settings')">Settings</button>
+</div>
+
+<!-- ===== TITLE ===== -->
+<div class="screen active" id="s-title">
+<div class="phone">
+  <div class="title-screen">
+    <div class="title-text">BRICK<br>BREAKER</div>
+    <div class="title-sub">A Classic Arcade Game</div>
+    <div class="title-buttons">
+      <button class="k-btn k-btn-green" style="min-width:240px;font-size:20px;padding:16px 0;">PLAY</button>
+      <button class="k-btn k-btn-grey" style="min-width:180px;font-size:14px;">Settings</button>
+    </div>
+  </div>
+</div>
+<div class="screen-label">Title Screen</div>
+</div>
+
+<!-- ===== STAGE SELECT ===== -->
+<div class="screen" id="s-stage">
+<div class="phone">
+  <div class="stage-screen">
+    <div style="font-size:26px;font-weight:bold;text-shadow:0 2px 0 #1a5a94;letter-spacing:2px;">STAGE SELECT</div>
+    <div class="stage-grid">
+      <div class="stage-card k-btn k-btn-green" style="min-width:0;padding:10px;">
+        <div class="num">1</div>
+        <div class="stars">⭐⭐⭐</div>
+      </div>
+      <div class="stage-card k-btn k-btn-green" style="min-width:0;padding:10px;">
+        <div class="num">2</div>
+        <div class="stars">⭐⭐☆</div>
+      </div>
+      <div class="stage-card k-btn k-btn-yellow" style="min-width:0;padding:10px;">
+        <div class="num">3</div>
+        <div class="stars">☆☆☆</div>
+      </div>
+      <div class="stage-card k-btn k-btn-grey" style="min-width:0;padding:10px;">
+        <div class="num" style="color:#999;">🔒</div>
+      </div>
+      <div class="stage-card k-btn k-btn-grey" style="min-width:0;padding:10px;">
+        <div class="num" style="color:#999;">🔒</div>
+      </div>
+    </div>
+    <button class="k-btn k-btn-grey" style="min-width:140px;font-size:13px;">Back</button>
+  </div>
+</div>
+<div class="screen-label">Stage Select</div>
+</div>
+
+<!-- ===== GAME HUD ===== -->
+<div class="screen" id="s-game">
+<div class="phone">
+  <div class="game-bg" style="display:flex;flex-direction:column;">
+    <!-- Top HUD -->
+    <div class="k-panel k-panel-blue" style="padding:10px 14px;border-image-slice:10 10 14 10 fill;border-image-width:10px 10px 14px 10px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:15px;font-weight:bold;color:#f5c52c;">Turn 3</span>
+      <span style="flex:1;text-align:center;font-size:12px;color:rgba(255,255,255,0.6);letter-spacing:1px;">LEVEL 2</span>
+      <span style="font-size:15px;font-weight:bold;color:#8ad4ff;">x52 ⚾</span>
+      <button class="k-btn k-btn-blue" style="min-width:0;padding:6px 10px;font-size:11px;">| |</button>
+    </div>
+    <!-- Ceiling -->
+    <div style="height:4px;background:rgba(80,110,170,0.8);"></div>
+    <!-- Play area -->
+    <div style="flex:1;background:#16163a;border-left:2px solid rgba(80,110,170,0.5);border-right:2px solid rgba(80,110,170,0.5);position:relative;padding:8px 2px;">
+      <!-- Mock bricks -->
+      <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:2px;padding:2px;">
+        <div></div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">5</div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">8</div><div style="aspect-ratio:1;background:#f5a623;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">12</div><div style="aspect-ratio:1;background:#f5a623;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">15</div><div style="aspect-ratio:1;background:#f5a623;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">15</div><div style="aspect-ratio:1;background:#f5a623;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">12</div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">8</div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">5</div><div></div>
+        <div></div><div></div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">5</div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">8</div><div style="aspect-ratio:1;background:#f5a623;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">10</div><div style="aspect-ratio:1;background:#f5a623;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">10</div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">8</div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">5</div><div></div><div></div>
+        <div></div><div></div><div></div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">5</div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">8</div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">8</div><div style="aspect-ratio:1;background:#8bc34a;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:bold;color:#fff;">5</div><div></div><div></div><div></div>
+      </div>
+      <!-- Ball mockups -->
+      <div style="position:absolute;bottom:180px;left:200px;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#8ad4ff,#45b0e6);box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+      <div style="position:absolute;bottom:200px;left:190px;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#8ad4ff,#45b0e6);box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+      <div style="position:absolute;bottom:220px;left:180px;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#8ad4ff,#45b0e6);box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+    </div>
+    <!-- Floor -->
+    <div style="height:4px;background:rgba(80,110,170,0.8);"></div>
+    <!-- Bottom area -->
+    <div class="k-panel k-panel-blue" style="padding:10px 14px;border-image-slice:14 10 10 10 fill;border-image-width:14px 10px 10px 10px;display:flex;align-items:center;justify-content:center;gap:6px;min-height:80px;">
+      <div style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#8ad4ff,#45b0e6);"></div>
+      <span style="font-size:14px;font-weight:bold;color:#8ad4ff;">x52</span>
+    </div>
+  </div>
+</div>
+<div class="screen-label">Game HUD (In-Game)</div>
+</div>
+
+<!-- ===== PAUSE ===== -->
+<div class="screen" id="s-pause">
+<div class="phone">
+  <div class="game-bg">
+    <div class="dimmer">
+      <div class="popup">
+        <div class="k-panel k-panel-blue popup-header">PAUSED</div>
+        <div class="k-panel popup-body" style="margin-top:-4px;padding:20px 30px;">
+          <button class="k-btn k-btn-green">Resume</button>
+          <button class="k-btn k-btn-blue">Settings</button>
+          <button class="k-btn k-btn-grey">Stage Select</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="screen-label">Pause Menu</div>
+</div>
+
+<!-- ===== GAME OVER ===== -->
+<div class="screen" id="s-gameover">
+<div class="phone">
+  <div class="game-bg">
+    <div class="dimmer">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <!-- Panel + Stars overlapping -->
+        <div style="position:relative;width:280px;margin-top:44px;">
+          <!-- Stars (overlapping top of panel) -->
+          <div style="position:absolute;top:-42px;left:50%;transform:translateX(-50%);display:flex;align-items:flex-end;z-index:2;">
+            <img src="../kenney_ui-pack/PNG/Grey/Default/star.png" style="width:54px;height:54px;transform:rotate(-15deg);margin-right:-8px;">
+            <img src="../kenney_ui-pack/PNG/Grey/Default/star.png" style="width:70px;height:70px;margin-bottom:6px;">
+            <img src="../kenney_ui-pack/PNG/Grey/Default/star.png" style="width:54px;height:54px;transform:rotate(15deg);margin-left:-8px;">
+          </div>
+          <div class="k-panel k-panel-blue popup-header" style="border-image-source:url('../kenney_ui-pack/PNG/Red/Default/button_rectangle_depth_flat.png');position:relative;z-index:1;padding-top:30px;">GAME OVER</div>
+          <div class="k-panel popup-body" style="margin-top:-4px;padding:20px 30px;position:relative;z-index:1;">
+            <div class="score-label">Turn</div>
+            <div class="score">12</div>
+          </div>
+        </div>
+        <!-- Icon buttons row -->
+        <div style="display:flex;gap:18px;align-items:flex-end;margin-top:20px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+            <div style="width:56px;height:56px;position:relative;cursor:pointer;">
+              <img src="../kenney_ui-pack/PNG/Grey/Default/button_round_depth_flat.png" style="width:100%;height:100%;">
+              <img src="../assets/images/ui/icon_home.png" style="width:26px;height:26px;position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);">
+            </div>
+            <span style="font-size:10px;color:rgba(255,255,255,0.4);">Back</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+            <div style="width:70px;height:70px;position:relative;cursor:pointer;">
+              <img src="../kenney_ui-pack/PNG/Yellow/Default/button_round_depth_flat.png" style="width:100%;height:100%;">
+              <img src="../assets/images/ui/icon_return.png" style="width:32px;height:32px;position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);">
+            </div>
+            <span style="font-size:10px;color:rgba(255,255,255,0.4);">Retry</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="screen-label">Game Over</div>
+</div>
+
+<!-- ===== STAGE CLEAR ===== -->
+<div class="screen" id="s-clear">
+<div class="phone">
+  <div class="game-bg">
+    <div class="dimmer">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <!-- Panel + Stars overlapping top -->
+        <div style="position:relative;width:280px;margin-top:44px;">
+          <!-- Stars (overlapping top of panel) -->
+          <div style="position:absolute;top:-42px;left:50%;transform:translateX(-50%);display:flex;align-items:flex-end;z-index:2;">
+            <img src="../kenney_ui-pack/PNG/Yellow/Default/star.png" style="width:54px;height:54px;transform:rotate(-15deg);filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));margin-right:-8px;">
+            <img src="../kenney_ui-pack/PNG/Yellow/Default/star.png" style="width:70px;height:70px;margin-bottom:6px;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.3));">
+            <img src="../kenney_ui-pack/PNG/Grey/Default/star.png" style="width:54px;height:54px;transform:rotate(15deg);margin-left:-8px;">
+          </div>
+          <div class="k-panel k-panel-blue popup-header" style="position:relative;z-index:1;padding-top:30px;">STAGE CLEAR!</div>
+          <div class="k-panel popup-body" style="margin-top:-4px;padding:20px 30px;position:relative;z-index:1;">
+            <div class="score-label">Turn</div>
+            <div class="score">6</div>
+          </div>
+        </div>
+        <!-- Icon buttons row -->
+        <div style="display:flex;gap:18px;align-items:flex-end;margin-top:20px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+            <div style="width:56px;height:56px;position:relative;cursor:pointer;">
+              <img src="../kenney_ui-pack/PNG/Grey/Default/button_round_depth_flat.png" style="width:100%;height:100%;">
+              <img src="../assets/images/ui/icon_home.png" style="width:26px;height:26px;position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);">
+            </div>
+            <span style="font-size:10px;color:rgba(255,255,255,0.4);">Back</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+            <div style="width:56px;height:56px;position:relative;cursor:pointer;">
+              <img src="../kenney_ui-pack/PNG/Yellow/Default/button_round_depth_flat.png" style="width:100%;height:100%;">
+              <img src="../assets/images/ui/icon_return.png" style="width:26px;height:26px;position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);">
+            </div>
+            <span style="font-size:10px;color:rgba(255,255,255,0.4);">Retry</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+            <div style="width:70px;height:70px;position:relative;cursor:pointer;">
+              <img src="../kenney_ui-pack/PNG/Green/Default/button_round_depth_flat.png" style="width:100%;height:100%;">
+              <img src="../assets/images/ui/icon_next.png" style="width:32px;height:32px;position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);">
+            </div>
+            <span style="font-size:10px;color:rgba(255,255,255,0.4);">Next</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="screen-label">Stage Clear</div>
+</div>
+
+<!-- ===== SETTINGS ===== -->
+<div class="screen" id="s-settings">
+<div class="phone">
+  <div class="game-bg" style="background:#3a8fd4;">
+    <div class="dimmer" style="background:rgba(0,0,0,0.4);">
+      <div class="popup" style="width:320px;">
+        <div class="k-panel k-panel-blue popup-header">Settings</div>
+        <div class="k-panel popup-body" style="margin-top:-4px;padding:24px 30px;gap:14px;">
+          <div class="settings-row">
+            <label>BGM Volume</label>
+            <input type="range" class="settings-slider" min="0" max="100" value="75">
+          </div>
+          <div class="settings-row">
+            <label>SFX Volume</label>
+            <input type="range" class="settings-slider" min="0" max="100" value="100">
+          </div>
+          <button class="k-btn k-btn-green" style="margin-top:8px;">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="screen-label">Settings</div>
+</div>
+
+<script>
+function show(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('s-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -1,19 +1,31 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/settings_popup.gd" id="1_settings"]
 [ext_resource type="FontFile" path="res://assets/fonts/Kenney Future.ttf" id="2_font"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/panel_bg.png" id="3_panel"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/btn_green.png" id="4_btn_green"]
 
-[sub_resource type="StyleBoxFlat" id="panel_style"]
-bg_color = Color(0.1, 0.12, 0.22, 0.95)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.4, 0.6, 0.5)
+[sub_resource type="StyleBoxTexture" id="panel_style"]
+texture = ExtResource("3_panel")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+content_margin_left = 20.0
+content_margin_top = 16.0
+content_margin_right = 20.0
+content_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxTexture" id="btn_close"]
+texture = ExtResource("4_btn_green")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 16.0
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
 
 [node name="SettingsPopup" type="Control"]
 layout_mode = 3
@@ -40,10 +52,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -150.0
-offset_top = -130.0
-offset_right = 150.0
-offset_bottom = 130.0
+offset_left = -155.0
+offset_top = -140.0
+offset_right = 155.0
+offset_bottom = 140.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("panel_style")
@@ -53,27 +65,27 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = 15.0
-offset_right = -20.0
-offset_bottom = -15.0
+offset_left = 6.0
+offset_top = 4.0
+offset_right = -6.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.27, 0.69, 0.9, 1)
 text = "Settings"
 horizontal_alignment = 1
 
 [node name="BGMLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.4, 0.4, 0.45, 1)
 text = "BGM Volume"
 
 [node name="BGMSlider" type="HSlider" parent="Panel/VBoxContainer"]
@@ -86,8 +98,8 @@ value = 1.0
 [node name="SFXLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.4, 0.4, 0.45, 1)
 text = "SFX Volume"
 
 [node name="SFXSlider" type="HSlider" parent="Panel/VBoxContainer"]
@@ -99,10 +111,13 @@ value = 1.0
 
 [node name="CloseButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 44)
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 15
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("btn_close")
+theme_override_styles/hover = SubResource("btn_close")
+theme_override_styles/pressed = SubResource("btn_close")
 text = "Close"
 
 [connection signal="value_changed" from="Panel/VBoxContainer/BGMSlider" to="." method="_on_bgm_slider_value_changed"]
