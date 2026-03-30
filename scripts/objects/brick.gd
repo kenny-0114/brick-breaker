@@ -3,7 +3,7 @@
 # 사각형은 Sprite2D 텍스처, 삼각형은 텍스처 Polygon2D로 렌더링한다.
 extends StaticBody2D
 
-signal brick_destroyed(position: Vector2)
+signal brick_destroyed(position: Vector2, item: String)
 
 # HP 구간별 벽돌담 타일 텍스처
 const TEXTURES := {
@@ -53,6 +53,7 @@ var _is_triangle := false
 var _polygon: Polygon2D = null
 var _border_polygon: Polygon2D = null
 var _hit_tween: Tween = null
+var item: String = ""
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var hp_label: Label = $HPLabel
@@ -148,12 +149,21 @@ func hit() -> void:
 	hp -= 1
 	if hp <= 0:
 		_is_destroyed = true
-		brick_destroyed.emit(global_position)
+		brick_destroyed.emit(global_position, item)
 		queue_free()
 	else:
 		_update_color_by_hp()
 		_update_hp_label()
 		_play_hit_effect()
+
+
+# 미사일에 의한 즉시 파괴. HP를 무시하고 파괴한다.
+func destroy_by_missile() -> void:
+	if _is_destroyed:
+		return
+	_is_destroyed = true
+	brick_destroyed.emit(global_position, item)
+	queue_free()
 
 
 # HP 구간에 따른 색상 키를 반환한다.
