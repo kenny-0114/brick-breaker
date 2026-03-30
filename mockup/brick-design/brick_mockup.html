@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Brick Tile Mockup - Square + Triangle</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #2a2a3a;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+  h1 { font-size: 20px; letter-spacing: 2px; }
+  h2 { font-size: 15px; color: #aab; margin-bottom: 10px; }
+  .section { background: #1a1a2e; border-radius: 12px; padding: 24px; max-width: 520px; width: 100%; }
+
+  /* ===== Brick Tile SVG Candidates ===== */
+  .tile-row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .tile-card {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px;
+  }
+  .tile-card .label { font-size: 11px; color: #889; }
+
+  /* ===== Game Preview ===== */
+  .game-frame {
+    width: 480px; height: 500px;
+    background: #16163a;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+  }
+  .game-ceiling { height: 4px; background: rgba(80,110,170,0.8); }
+  .game-area {
+    padding: 8px 4px;
+    border-left: 4px solid rgba(80,110,170,0.8);
+    border-right: 4px solid rgba(80,110,170,0.8);
+  }
+  .brick-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    padding: 2px;
+  }
+  .brick-cell {
+    aspect-ratio: 1;
+    position: relative;
+  }
+  .brick-cell svg { width: 100%; height: 100%; display: block; }
+  .brick-cell .hp {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: bold; color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    pointer-events: none;
+  }
+  /* Triangle brick - HP positioned toward right-angle */
+  .brick-cell.tri .hp { font-size: 10px; }
+  .brick-cell.tri-tl .hp { top: -15%; left: -10%; }
+  .brick-cell.tri-tr .hp { top: -15%; right: -10%; left: auto; }
+
+  .empty-cell { aspect-ratio: 1; }
+
+  /* Color label */
+  .color-tag { font-size: 10px; color: #667; text-align: center; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<h1>BRICK TILE MOCKUP</h1>
+<p style="color:#667; font-size:13px;">70x70 SVG tile → modulate color → square & triangle bricks</p>
+
+<!-- ===== SECTION 1: Tile Candidates ===== -->
+<div class="section">
+  <h2>1. Base Tile Candidates (white-ish)</h2>
+  <div class="tile-row">
+    <!-- Candidate A: Clean flat with subtle border -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <rect x="1" y="1" width="68" height="68" rx="4" fill="#f0ece4" />
+        <rect x="1" y="1" width="68" height="4" rx="4" fill="#f8f4ee" />
+        <rect x="1" y="63" width="68" height="6" rx="4" fill="#d8d2c6" />
+      </svg>
+      <div class="label">A. Flat + depth</div>
+    </div>
+    <!-- Candidate B: Brick pattern subtle -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <rect x="1" y="1" width="68" height="68" rx="4" fill="#f0ece4" />
+        <rect x="1" y="1" width="68" height="3" rx="4" fill="#f8f4ee" />
+        <rect x="1" y="64" width="68" height="5" rx="4" fill="#d8d2c6" />
+        <line x1="35" y1="20" x2="35" y2="22" stroke="#e0dcd4" stroke-width="1.5"/>
+        <line x1="10" y1="35" x2="60" y2="35" stroke="#e0dcd4" stroke-width="0.8"/>
+        <line x1="35" y1="48" x2="35" y2="50" stroke="#e0dcd4" stroke-width="1.5"/>
+      </svg>
+      <div class="label">B. Subtle brick lines</div>
+    </div>
+    <!-- Candidate C: Kenney house style -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <rect x="0" y="0" width="70" height="70" fill="#f0ece4"/>
+        <rect x="0" y="0" width="16" height="15" fill="#ddd8ca"/>
+        <rect x="0" y="35" width="16" height="15" fill="#ddd8ca"/>
+        <rect x="0" y="17" width="16" height="18" fill="#e4ddd0"/>
+        <rect x="0" y="52" width="16" height="18" fill="#e4ddd0"/>
+      </svg>
+      <div class="label">C. Kenney original (beige)</div>
+    </div>
+    <!-- Candidate D: Pure white clean -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <rect x="1" y="1" width="68" height="68" rx="5" fill="#f5f2ed" />
+        <rect x="1" y="1" width="68" height="3" rx="5" fill="#faf8f4" />
+        <rect x="1" y="64" width="68" height="5" rx="5" fill="#ddd8cc" />
+        <rect x="4" y="4" width="62" height="58" rx="3" fill="none" stroke="#e8e4dc" stroke-width="1"/>
+      </svg>
+      <div class="label">D. Clean inset border</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION 2: Color Variants (using Candidate A) ===== -->
+<div class="section">
+  <h2>2. HP Color Variants (modulate tinting)</h2>
+  <div class="tile-row">
+    <!-- Green -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70" style="filter: saturate(1.2);">
+        <rect x="1" y="1" width="68" height="68" rx="4" fill="#8bc34a" />
+        <rect x="1" y="1" width="68" height="4" rx="4" fill="#9cd45a" />
+        <rect x="1" y="63" width="68" height="6" rx="4" fill="#6a9a30" />
+      </svg>
+      <div class="label">Green (HP 1-10)</div>
+    </div>
+    <!-- Orange -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623" />
+        <rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840" />
+        <rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10" />
+      </svg>
+      <div class="label">Orange (HP 11-30)</div>
+    </div>
+    <!-- Red -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <rect x="1" y="1" width="68" height="68" rx="4" fill="#e74c3c" />
+        <rect x="1" y="1" width="68" height="4" rx="4" fill="#f06050" />
+        <rect x="1" y="63" width="68" height="6" rx="4" fill="#c0392b" />
+      </svg>
+      <div class="label">Red (HP 31+)</div>
+    </div>
+    <!-- Grey -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <rect x="1" y="1" width="68" height="68" rx="4" fill="#8a8a95" />
+        <rect x="1" y="1" width="68" height="4" rx="4" fill="#9a9aa5" />
+        <rect x="1" y="63" width="68" height="6" rx="4" fill="#6a6a75" />
+      </svg>
+      <div class="label">Grey (Indestructible)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION 3: Triangle Variants ===== -->
+<div class="section">
+  <h2>3. Triangle Bricks (square tile clipped)</h2>
+  <div class="tile-row">
+    <!-- Dir 2: ◤ -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <defs><clipPath id="tri2"><polygon points="0,0 70,0 0,70"/></clipPath></defs>
+        <g clip-path="url(#tri2)">
+          <rect x="0" y="0" width="70" height="70" rx="0" fill="#8bc34a" />
+          <rect x="0" y="0" width="70" height="4" fill="#9cd45a" />
+          <rect x="0" y="64" width="70" height="6" fill="#6a9a30" />
+        </g>
+      </svg>
+      <div class="label">Dir 2 ◤ (left edge)</div>
+    </div>
+    <!-- Dir 3: ◥ -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <defs><clipPath id="tri3"><polygon points="0,0 70,0 70,70"/></clipPath></defs>
+        <g clip-path="url(#tri3)">
+          <rect x="0" y="0" width="70" height="70" rx="0" fill="#f5a623" />
+          <rect x="0" y="0" width="70" height="4" fill="#fbb840" />
+          <rect x="0" y="64" width="70" height="6" fill="#d08a10" />
+        </g>
+      </svg>
+      <div class="label">Dir 3 ◥ (right edge)</div>
+    </div>
+    <!-- Dir 0: ◣ -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <defs><clipPath id="tri0"><polygon points="0,0 0,70 70,70"/></clipPath></defs>
+        <g clip-path="url(#tri0)">
+          <rect x="0" y="0" width="70" height="70" fill="#e74c3c" />
+          <rect x="0" y="0" width="70" height="4" fill="#f06050" />
+          <rect x="0" y="64" width="70" height="6" fill="#c0392b" />
+        </g>
+      </svg>
+      <div class="label">Dir 0 ◣</div>
+    </div>
+    <!-- Dir 1: ◢ -->
+    <div class="tile-card">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <defs><clipPath id="tri1"><polygon points="70,0 0,70 70,70"/></clipPath></defs>
+        <g clip-path="url(#tri1)">
+          <rect x="0" y="0" width="70" height="70" fill="#8a8a95" />
+          <rect x="0" y="0" width="70" height="4" fill="#9a9aa5" />
+          <rect x="0" y="64" width="70" height="6" fill="#6a6a75" />
+        </g>
+      </svg>
+      <div class="label">Dir 1 ◢</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION 4: Game Layout Preview ===== -->
+<div class="section">
+  <h2>4. Game Layout Preview (480px, 7-col square grid)</h2>
+  <div class="game-frame">
+    <div class="game-ceiling"></div>
+    <div class="game-area">
+      <div class="brick-grid">
+        <!-- Row 0: V-shape top -->
+        <div class="empty-cell"></div>
+        <div class="empty-cell"></div>
+        <div class="brick-cell tri tri-tr">
+          <svg viewBox="0 0 70 70"><defs><clipPath id="g2"><polygon points="0,0 70,0 70,70"/></clipPath></defs>
+          <g clip-path="url(#g2)"><rect width="70" height="70" fill="#f5a623"/><rect y="0" width="70" height="4" fill="#fbb840"/><rect y="64" width="70" height="6" fill="#d08a10"/></g></svg>
+          <div class="hp">20</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#e74c3c"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#f06050"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#c0392b"/></svg>
+          <div class="hp">40</div>
+        </div>
+        <div class="brick-cell tri tri-tl">
+          <svg viewBox="0 0 70 70"><defs><clipPath id="g3"><polygon points="0,0 70,0 0,70"/></clipPath></defs>
+          <g clip-path="url(#g3)"><rect width="70" height="70" fill="#f5a623"/><rect y="0" width="70" height="4" fill="#fbb840"/><rect y="64" width="70" height="6" fill="#d08a10"/></g></svg>
+          <div class="hp">20</div>
+        </div>
+        <div class="empty-cell"></div>
+        <div class="empty-cell"></div>
+
+        <!-- Row 1 -->
+        <div class="empty-cell"></div>
+        <div class="brick-cell tri tri-tr">
+          <svg viewBox="0 0 70 70"><defs><clipPath id="g4"><polygon points="0,0 70,0 70,70"/></clipPath></defs>
+          <g clip-path="url(#g4)"><rect width="70" height="70" fill="#8bc34a"/><rect y="0" width="70" height="4" fill="#9cd45a"/><rect y="64" width="70" height="6" fill="#6a9a30"/></g></svg>
+          <div class="hp">15</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10"/></svg>
+          <div class="hp">30</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#e74c3c"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#f06050"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#c0392b"/></svg>
+          <div class="hp">35</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10"/></svg>
+          <div class="hp">30</div>
+        </div>
+        <div class="brick-cell tri tri-tl">
+          <svg viewBox="0 0 70 70"><defs><clipPath id="g5"><polygon points="0,0 70,0 0,70"/></clipPath></defs>
+          <g clip-path="url(#g5)"><rect width="70" height="70" fill="#8bc34a"/><rect y="0" width="70" height="4" fill="#9cd45a"/><rect y="64" width="70" height="6" fill="#6a9a30"/></g></svg>
+          <div class="hp">15</div>
+        </div>
+        <div class="empty-cell"></div>
+
+        <!-- Row 2: Full width -->
+        <div class="brick-cell tri tri-tr">
+          <svg viewBox="0 0 70 70"><defs><clipPath id="g6"><polygon points="0,0 70,0 70,70"/></clipPath></defs>
+          <g clip-path="url(#g6)"><rect width="70" height="70" fill="#8bc34a"/><rect y="0" width="70" height="4" fill="#9cd45a"/><rect y="64" width="70" height="6" fill="#6a9a30"/></g></svg>
+          <div class="hp">10</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10"/></svg>
+          <div class="hp">20</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10"/></svg>
+          <div class="hp">25</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#e74c3c"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#f06050"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#c0392b"/></svg>
+          <div class="hp">30</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10"/></svg>
+          <div class="hp">25</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10"/></svg>
+          <div class="hp">20</div>
+        </div>
+        <div class="brick-cell tri tri-tl">
+          <svg viewBox="0 0 70 70"><defs><clipPath id="g7"><polygon points="0,0 70,0 0,70"/></clipPath></defs>
+          <g clip-path="url(#g7)"><rect width="70" height="70" fill="#8bc34a"/><rect y="0" width="70" height="4" fill="#9cd45a"/><rect y="64" width="70" height="6" fill="#6a9a30"/></g></svg>
+          <div class="hp">10</div>
+        </div>
+
+        <!-- Row 3: Full row -->
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#8bc34a"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#9cd45a"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#6a9a30"/></svg>
+          <div class="hp">15</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10"/></svg>
+          <div class="hp">20</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10"/></svg>
+          <div class="hp">25</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#e74c3c"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#f06050"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#c0392b"/></svg>
+          <div class="hp">30</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10"/></svg>
+          <div class="hp">25</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10"/></svg>
+          <div class="hp">20</div>
+        </div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#8bc34a"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#9cd45a"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#6a9a30"/></svg>
+          <div class="hp">15</div>
+        </div>
+
+        <!-- Row 4: ball items + grey -->
+        <div class="empty-cell"></div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#8a8a95"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#9a9aa5"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#6a6a75"/></svg>
+          <div class="hp" style="color:#ccc;">INF</div>
+        </div>
+        <div class="empty-cell"></div>
+        <div class="empty-cell" style="display:flex;align-items:center;justify-content:center;">
+          <div style="width:20px;height:20px;border-radius:50%;background:#4cc355;border:2px solid #3a9944;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:bold;">+</div>
+        </div>
+        <div class="empty-cell"></div>
+        <div class="brick-cell">
+          <svg viewBox="0 0 70 70"><rect x="1" y="1" width="68" height="68" rx="4" fill="#8a8a95"/><rect x="1" y="1" width="68" height="4" rx="4" fill="#9a9aa5"/><rect x="1" y="63" width="68" height="6" rx="4" fill="#6a6a75"/></svg>
+          <div class="hp" style="color:#ccc;">INF</div>
+        </div>
+        <div class="empty-cell"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION 5: SVG Export for Godot ===== -->
+<div class="section">
+  <h2>5. Final SVG Tile (for Godot export)</h2>
+  <p style="color:#778; font-size:12px; margin-bottom:12px;">
+    This white-ish tile will be exported as SVG → imported to Godot.<br>
+    Sprite2D.modulate tints it to green/orange/red/grey.<br>
+    Triangle bricks use textured Polygon2D with UV mapping.
+  </p>
+  <div class="tile-row">
+    <div class="tile-card">
+      <svg id="final-tile" width="140" height="140" viewBox="0 0 70 70">
+        <!-- Base fill -->
+        <rect x="1" y="1" width="68" height="68" rx="4" fill="#f0ece4" />
+        <!-- Top highlight -->
+        <rect x="1" y="1" width="68" height="4" rx="4" fill="#f8f4ee" />
+        <!-- Bottom shadow (Kenney depth) -->
+        <rect x="1" y="63" width="68" height="6" rx="4" fill="#d8d2c6" />
+      </svg>
+      <div class="label">Final: 70x70, light beige</div>
+    </div>
+    <div style="display:flex; align-items:center; font-size:24px; color:#556;">→</div>
+    <div class="tile-card">
+      <svg width="140" height="140" viewBox="0 0 70 70">
+        <rect x="1" y="1" width="68" height="68" rx="4" fill="#8bc34a" />
+        <rect x="1" y="1" width="68" height="4" rx="4" fill="#9cd45a" />
+        <rect x="1" y="63" width="68" height="6" rx="4" fill="#6a9a30" />
+      </svg>
+      <div class="label">modulate Green</div>
+    </div>
+    <div class="tile-card">
+      <svg width="140" height="140" viewBox="0 0 70 70">
+        <rect x="1" y="1" width="68" height="68" rx="4" fill="#f5a623" />
+        <rect x="1" y="1" width="68" height="4" rx="4" fill="#fbb840" />
+        <rect x="1" y="63" width="68" height="6" rx="4" fill="#d08a10" />
+      </svg>
+      <div class="label">modulate Orange</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

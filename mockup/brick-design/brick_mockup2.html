@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Brick Tile v2 - Grid Pattern + Gradient</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #2a2a3a;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  h1 { font-size: 20px; letter-spacing: 2px; }
+  h2 { font-size: 14px; color: #aab; margin-bottom: 10px; }
+  .section { background: #1a1a2e; border-radius: 12px; padding: 24px; max-width: 560px; width: 100%; }
+  .tile-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .tile-card {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px;
+  }
+  .tile-card .label { font-size: 10px; color: #889; text-align: center; }
+
+  .game-frame {
+    width: 480px; background: #16163a; border-radius: 8px; overflow: hidden;
+  }
+  .game-ceiling { height: 4px; background: rgba(80,110,170,0.8); }
+  .game-area {
+    padding: 8px 4px;
+    border-left: 4px solid rgba(80,110,170,0.8);
+    border-right: 4px solid rgba(80,110,170,0.8);
+  }
+  .brick-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 2px; }
+  .brick-cell { aspect-ratio: 1; position: relative; }
+  .brick-cell svg { width: 100%; height: 100%; display: block; }
+  .brick-cell .hp {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: bold; color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  }
+  .brick-cell.tri .hp { font-size: 10px; }
+  .brick-cell.tri-tr .hp { justify-content: flex-end; padding-right: 18%; padding-top: 0; align-items: flex-start; padding-top: 15%; }
+  .brick-cell.tri-tl .hp { justify-content: flex-start; padding-left: 18%; align-items: flex-start; padding-top: 15%; }
+  .empty-cell { aspect-ratio: 1; }
+</style>
+</head>
+<body>
+
+<h1>BRICK TILE v2</h1>
+<p style="color:#667; font-size:12px;">격자무늬 벽돌 패턴 + 그라데이션 변형</p>
+
+<!-- ===== 격자 패턴 후보들 ===== -->
+<div class="section">
+  <h2>1. Grid Brick Pattern Variants</h2>
+  <div class="tile-row">
+
+    <!-- E: 2x3 brick grid + gradient -->
+    <div class="tile-card">
+      <svg width="120" height="120" viewBox="0 0 70 70">
+        <defs>
+          <linearGradient id="gE" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#faf6f0"/>
+            <stop offset="100%" stop-color="#e8e0d2"/>
+          </linearGradient>
+        </defs>
+        <rect width="70" height="70" rx="3" fill="url(#gE)"/>
+        <!-- Row 1: 2 bricks -->
+        <rect x="3" y="3" width="31" height="20" rx="2" fill="none" stroke="#d5cfc2" stroke-width="1.2"/>
+        <rect x="36" y="3" width="31" height="20" rx="2" fill="none" stroke="#d5cfc2" stroke-width="1.2"/>
+        <!-- Row 2: 3 bricks offset -->
+        <rect x="3" y="25" width="20" height="20" rx="2" fill="none" stroke="#d5cfc2" stroke-width="1.2"/>
+        <rect x="25" y="25" width="20" height="20" rx="2" fill="none" stroke="#d5cfc2" stroke-width="1.2"/>
+        <rect x="47" y="25" width="20" height="20" rx="2" fill="none" stroke="#d5cfc2" stroke-width="1.2"/>
+        <!-- Row 3: 2 bricks -->
+        <rect x="3" y="47" width="31" height="20" rx="2" fill="none" stroke="#d5cfc2" stroke-width="1.2"/>
+        <rect x="36" y="47" width="31" height="20" rx="2" fill="none" stroke="#d5cfc2" stroke-width="1.2"/>
+      </svg>
+      <div class="label">E. Brick grid<br>+ top-down gradient</div>
+    </div>
+
+    <!-- F: Uniform grid + stronger gradient -->
+    <div class="tile-card">
+      <svg width="120" height="120" viewBox="0 0 70 70">
+        <defs>
+          <linearGradient id="gF" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f8f4ec"/>
+            <stop offset="60%" stop-color="#f0ebe0"/>
+            <stop offset="100%" stop-color="#ddd6c6"/>
+          </linearGradient>
+        </defs>
+        <rect width="70" height="70" rx="3" fill="url(#gF)"/>
+        <!-- 3x3 uniform grid -->
+        <rect x="3" y="3" width="20" height="20" rx="2" fill="none" stroke="#d0c8b8" stroke-width="1"/>
+        <rect x="25" y="3" width="20" height="20" rx="2" fill="none" stroke="#d0c8b8" stroke-width="1"/>
+        <rect x="47" y="3" width="20" height="20" rx="2" fill="none" stroke="#d0c8b8" stroke-width="1"/>
+        <rect x="3" y="25" width="20" height="20" rx="2" fill="none" stroke="#d0c8b8" stroke-width="1"/>
+        <rect x="25" y="25" width="20" height="20" rx="2" fill="none" stroke="#d0c8b8" stroke-width="1"/>
+        <rect x="47" y="25" width="20" height="20" rx="2" fill="none" stroke="#d0c8b8" stroke-width="1"/>
+        <rect x="3" y="47" width="20" height="20" rx="2" fill="none" stroke="#d0c8b8" stroke-width="1"/>
+        <rect x="25" y="47" width="20" height="20" rx="2" fill="none" stroke="#d0c8b8" stroke-width="1"/>
+        <rect x="47" y="47" width="20" height="20" rx="2" fill="none" stroke="#d0c8b8" stroke-width="1"/>
+      </svg>
+      <div class="label">F. 3x3 uniform grid<br>+ 3-stop gradient</div>
+    </div>
+
+    <!-- G: Classic brick wall pattern -->
+    <div class="tile-card">
+      <svg width="120" height="120" viewBox="0 0 70 70">
+        <defs>
+          <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f8f5ef"/>
+            <stop offset="100%" stop-color="#e0d9cb"/>
+          </linearGradient>
+        </defs>
+        <rect width="70" height="70" rx="3" fill="url(#gG)"/>
+        <!-- Classic staggered brick wall -->
+        <!-- Row 1 -->
+        <rect x="2" y="2" width="32" height="15" rx="1.5" fill="none" stroke="#ccc5b5" stroke-width="1"/>
+        <rect x="36" y="2" width="32" height="15" rx="1.5" fill="none" stroke="#ccc5b5" stroke-width="1"/>
+        <!-- Row 2 offset -->
+        <rect x="2" y="19" width="15" height="15" rx="1.5" fill="none" stroke="#ccc5b5" stroke-width="1"/>
+        <rect x="19" y="19" width="32" height="15" rx="1.5" fill="none" stroke="#ccc5b5" stroke-width="1"/>
+        <rect x="53" y="19" width="15" height="15" rx="1.5" fill="none" stroke="#ccc5b5" stroke-width="1"/>
+        <!-- Row 3 -->
+        <rect x="2" y="36" width="32" height="15" rx="1.5" fill="none" stroke="#ccc5b5" stroke-width="1"/>
+        <rect x="36" y="36" width="32" height="15" rx="1.5" fill="none" stroke="#ccc5b5" stroke-width="1"/>
+        <!-- Row 4 offset -->
+        <rect x="2" y="53" width="15" height="15" rx="1.5" fill="none" stroke="#ccc5b5" stroke-width="1"/>
+        <rect x="19" y="53" width="32" height="15" rx="1.5" fill="none" stroke="#ccc5b5" stroke-width="1"/>
+        <rect x="53" y="53" width="15" height="15" rx="1.5" fill="none" stroke="#ccc5b5" stroke-width="1"/>
+      </svg>
+      <div class="label">G. Classic brick wall<br>staggered pattern</div>
+    </div>
+
+    <!-- H: Filled bricks with gradient -->
+    <div class="tile-card">
+      <svg width="120" height="120" viewBox="0 0 70 70">
+        <defs>
+          <linearGradient id="gH" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#faf7f2"/>
+            <stop offset="100%" stop-color="#e5ded0"/>
+          </linearGradient>
+          <linearGradient id="gHb" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0.08)"/>
+          </linearGradient>
+        </defs>
+        <rect width="70" height="70" rx="3" fill="url(#gH)"/>
+        <!-- Filled bricks with subtle inner gradient -->
+        <rect x="2" y="2" width="32" height="15" rx="1.5" fill="url(#gHb)" stroke="#d5cfc0" stroke-width="0.8"/>
+        <rect x="36" y="2" width="32" height="15" rx="1.5" fill="url(#gHb)" stroke="#d5cfc0" stroke-width="0.8"/>
+        <rect x="2" y="19" width="15" height="15" rx="1.5" fill="url(#gHb)" stroke="#d5cfc0" stroke-width="0.8"/>
+        <rect x="19" y="19" width="32" height="15" rx="1.5" fill="url(#gHb)" stroke="#d5cfc0" stroke-width="0.8"/>
+        <rect x="53" y="19" width="15" height="15" rx="1.5" fill="url(#gHb)" stroke="#d5cfc0" stroke-width="0.8"/>
+        <rect x="2" y="36" width="32" height="15" rx="1.5" fill="url(#gHb)" stroke="#d5cfc0" stroke-width="0.8"/>
+        <rect x="36" y="36" width="32" height="15" rx="1.5" fill="url(#gHb)" stroke="#d5cfc0" stroke-width="0.8"/>
+        <rect x="2" y="53" width="15" height="15" rx="1.5" fill="url(#gHb)" stroke="#d5cfc0" stroke-width="0.8"/>
+        <rect x="19" y="53" width="32" height="15" rx="1.5" fill="url(#gHb)" stroke="#d5cfc0" stroke-width="0.8"/>
+        <rect x="53" y="53" width="15" height="15" rx="1.5" fill="url(#gHb)" stroke="#d5cfc0" stroke-width="0.8"/>
+      </svg>
+      <div class="label">H. Filled bricks<br>+ inner gradient</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== 색상 적용 ===== -->
+<div class="section">
+  <h2>2. Color Tinted (Style H base)</h2>
+  <div class="tile-row">
+    <div class="tile-card">
+      <svg width="100" height="100" viewBox="0 0 70 70">
+        <defs>
+          <linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a4d65a"/><stop offset="100%" stop-color="#7ab830"/></linearGradient>
+          <linearGradient id="ggb" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.2)"/><stop offset="100%" stop-color="rgba(0,0,0,0.1)"/></linearGradient>
+        </defs>
+        <rect width="70" height="70" rx="3" fill="url(#gg)"/>
+        <rect x="2" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="36" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="19" y="19" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="53" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="36" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="19" y="53" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="53" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      </svg>
+      <div class="label">Green</div>
+    </div>
+    <div class="tile-card">
+      <svg width="100" height="100" viewBox="0 0 70 70">
+        <defs>
+          <linearGradient id="go" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fbc044"/><stop offset="100%" stop-color="#e89a10"/></linearGradient>
+        </defs>
+        <rect width="70" height="70" rx="3" fill="url(#go)"/>
+        <rect x="2" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="36" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="19" y="19" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="53" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="36" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="19" y="53" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="53" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      </svg>
+      <div class="label">Orange</div>
+    </div>
+    <div class="tile-card">
+      <svg width="100" height="100" viewBox="0 0 70 70">
+        <defs>
+          <linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f06050"/><stop offset="100%" stop-color="#c0392b"/></linearGradient>
+        </defs>
+        <rect width="70" height="70" rx="3" fill="url(#gr)"/>
+        <rect x="2" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="36" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="19" y="19" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="53" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="36" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="19" y="53" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="53" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      </svg>
+      <div class="label">Red</div>
+    </div>
+    <div class="tile-card">
+      <svg width="100" height="100" viewBox="0 0 70 70">
+        <defs>
+          <linearGradient id="gy" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9a9aa8"/><stop offset="100%" stop-color="#6e6e7a"/></linearGradient>
+        </defs>
+        <rect width="70" height="70" rx="3" fill="url(#gy)"/>
+        <rect x="2" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="36" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="19" y="19" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="53" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="36" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="2" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="19" y="53" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        <rect x="53" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      </svg>
+      <div class="label">Grey (INF)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 삼각형 ===== -->
+<div class="section">
+  <h2>3. Triangle Bricks (clipped from tile)</h2>
+  <div class="tile-row">
+    <div class="tile-card">
+      <svg width="100" height="100" viewBox="0 0 70 70">
+        <defs>
+          <clipPath id="ct3"><polygon points="0,0 70,0 70,70"/></clipPath>
+        </defs>
+        <g clip-path="url(#ct3)">
+          <rect width="70" height="70" rx="0" fill="url(#go)"/>
+          <rect x="2" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="36" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="2" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="19" y="19" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="53" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="2" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="36" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="2" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="19" y="53" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="53" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        </g>
+      </svg>
+      <div class="label">◥ Dir 3 (Orange)</div>
+    </div>
+    <div class="tile-card">
+      <svg width="100" height="100" viewBox="0 0 70 70">
+        <defs>
+          <clipPath id="ct2"><polygon points="0,0 70,0 0,70"/></clipPath>
+        </defs>
+        <g clip-path="url(#ct2)">
+          <rect width="70" height="70" fill="url(#gg)"/>
+          <rect x="2" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="36" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="2" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="19" y="19" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="53" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="2" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="36" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="2" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="19" y="53" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+          <rect x="53" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+        </g>
+      </svg>
+      <div class="label">◤ Dir 2 (Green)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 게임 레이아웃 ===== -->
+<div class="section">
+  <h2>4. Game Layout (Level 2 - square grid)</h2>
+  <div class="game-frame">
+    <div class="game-ceiling"></div>
+    <div class="game-area">
+      <div class="brick-grid" id="gameGrid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Helper to create brick SVG
+function brickSVG(color1, color2) {
+  return `<svg viewBox="0 0 70 70">
+    <defs><linearGradient id="bg_${color1.slice(1)}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color1}"/><stop offset="100%" stop-color="${color2}"/></linearGradient></defs>
+    <rect width="70" height="70" rx="3" fill="url(#bg_${color1.slice(1)})"/>
+    <rect x="2" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+    <rect x="36" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+    <rect x="2" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+    <rect x="19" y="19" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+    <rect x="53" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+    <rect x="2" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+    <rect x="36" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+    <rect x="2" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+    <rect x="19" y="53" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+    <rect x="53" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+  </svg>`;
+}
+function triBrickSVG(color1, color2, dir) {
+  const clips = {
+    2: "0,0 70,0 0,70",
+    3: "0,0 70,0 70,70"
+  };
+  return `<svg viewBox="0 0 70 70">
+    <defs><linearGradient id="tbg_${color1.slice(1)}_${dir}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color1}"/><stop offset="100%" stop-color="${color2}"/></linearGradient>
+    <clipPath id="tc_${color1.slice(1)}_${dir}"><polygon points="${clips[dir]}"/></clipPath></defs>
+    <g clip-path="url(#tc_${color1.slice(1)}_${dir})">
+      <rect width="70" height="70" fill="url(#tbg_${color1.slice(1)}_${dir})"/>
+      <rect x="2" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      <rect x="36" y="2" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      <rect x="2" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      <rect x="19" y="19" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      <rect x="53" y="19" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      <rect x="2" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      <rect x="36" y="36" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      <rect x="2" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      <rect x="19" y="53" width="32" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+      <rect x="53" y="53" width="15" height="15" rx="1.5" fill="url(#ggb)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+    </g>
+  </svg>`;
+}
+
+const G = ['#a4d65a','#7ab830'];
+const O = ['#fbc044','#e89a10'];
+const R = ['#f06050','#c0392b'];
+const GR= ['#9a9aa8','#6e6e7a'];
+
+// Level 2 layout
+const layout = [
+  [null, null, {t:3,...O}, {hp:40,...R}, {t:2,...O}, null, null],
+  [null, {t:3,...G}, {hp:30,...O}, {hp:35,...R}, {hp:30,...O}, {t:2,...G}, null],
+  [{t:3,...G}, {hp:20,...O}, {hp:25,...O}, {hp:30,...R}, {hp:25,...O}, {hp:20,...O}, {t:2,...G}],
+  [{hp:15,...G}, {hp:20,...O}, {hp:25,...O}, {hp:30,...R}, {hp:25,...O}, {hp:20,...O}, {hp:15,...G}],
+  [null, {hp:-1,...GR}, null, null, null, {hp:-1,...GR}, null],
+];
+
+const grid = document.getElementById('gameGrid');
+layout.forEach(row => {
+  row.forEach(cell => {
+    if (!cell) {
+      grid.innerHTML += '<div class="empty-cell"></div>';
+      return;
+    }
+    const hp = cell.hp || cell[0] || '?';
+    const c1 = cell[0] || cell['0'];
+    const c2 = cell[1] || cell['1'];
+    const hpText = hp === -1 ? 'INF' : (cell.hp || '');
+    if (cell.t !== undefined) {
+      const triClass = cell.t === 3 ? 'tri-tr' : 'tri-tl';
+      grid.innerHTML += `<div class="brick-cell tri ${triClass}">${triBrickSVG(c1,c2,cell.t)}<div class="hp">${hpText || ''}</div></div>`;
+    } else {
+      grid.innerHTML += `<div class="brick-cell">${brickSVG(c1,c2)}<div class="hp">${hpText}</div></div>`;
+    }
+  });
+});
+</script>
+
+</body>
+</html>
