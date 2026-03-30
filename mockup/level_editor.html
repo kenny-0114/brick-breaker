@@ -93,6 +93,7 @@
     <button class="tool-btn" data-tool="tri">△ Tri</button>
     <button class="tool-btn" data-tool="ball">⊕ Ball</button>
     <button class="tool-btn" data-tool="missile">🚀 Missile</button>
+    <button class="tool-btn" data-tool="laser">⚡ Laser</button>
     <button class="tool-btn" data-tool="eraser">✕ Erase</button>
 
     <h3>HP</h3>
@@ -246,6 +247,23 @@ function render() {
         ctx.fillText('+', x + cellSize/2, y + cellSize/2);
       } else if (cell.type === 'tri') {
         drawTriBrick(x, y, cell);
+      } else if (cell.type === 'laser_shooter') {
+        ctx.fillStyle = '#555F69';
+        ctx.beginPath();
+        ctx.roundRect(x + 1, y + 1, cellSize - 2, cellSize - 2, 4);
+        ctx.fill();
+        ctx.fillStyle = '#D8E1EC';
+        ctx.beginPath();
+        ctx.roundRect(x + 3, y + 3, cellSize - 6, cellSize - 6, 3);
+        ctx.fill();
+        ctx.fillStyle = '#e74c3c';
+        ctx.font = `bold ${cellSize * 0.3}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const dirSymbols = {0:'↑', 1:'→', 2:'↓', 3:'←'};
+        const dirText = (cell.dirs || [0]).map(d => dirSymbols[d]).join('');
+        ctx.fillText(dirText, x + cellSize/2, y + cellSize/2 - 4);
+        drawHpText(x + cellSize/2, y + cellSize - 8, cell.uses);
       } else if (cell.item === 'missile') {
         // Missile item box
         drawItemBox(x, y, cell);
@@ -442,6 +460,10 @@ function applyTool(row, col) {
     if (existing) { selectCell(row, col); return; }
     grid[row][col] = { type: 'rect', hp: currentHp, item: 'missile' };
     markDirty();
+  } else if (currentTool === 'laser') {
+    if (existing) { selectCell(row, col); return; }
+    grid[row][col] = { type: 'laser_shooter', uses: 10, damage: 1, dirs: [0, 2] };
+    markDirty();
   } else if (currentTool === 'ball') {
     if (existing) { selectCell(row, col); return; }
     grid[row][col] = { type: 'ball' };
@@ -503,6 +525,11 @@ function updateSelectionUI() {
   if (cell.type === 'ball') {
     document.getElementById('selType').textContent = 'Ball Item';
     document.getElementById('selHpRow').style.display = 'none';
+    document.getElementById('selDirRow').style.display = 'none';
+  } else if (cell.type === 'laser_shooter') {
+    document.getElementById('selType').textContent = 'Laser Shooter';
+    document.getElementById('selHpRow').style.display = 'flex';
+    document.getElementById('selHpInput').value = cell.uses;
     document.getElementById('selDirRow').style.display = 'none';
   } else {
     document.getElementById('selType').textContent = cell.item === 'missile' ? 'Missile' : cell.type === 'tri' ? 'Triangle' : 'Rectangle';
@@ -612,13 +639,15 @@ document.getElementById('jsonToggle').addEventListener('click', () => {
 
 // ===== Grid <-> JSON =====
 function gridToJson() {
-  const bricks = [], ball_items = [];
+  const bricks = [], ball_items = [], laser_shooters = [];
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       const cell = grid[r][c];
       if (!cell) continue;
       if (cell.type === 'ball') {
         ball_items.push({ row: r, col: c });
+      } else if (cell.type === 'laser_shooter') {
+        laser_shooters.push({ row: r, col: c, uses: cell.uses, damage: cell.damage, dirs: cell.dirs });
       } else if (cell.type === 'tri') {
         bricks.push({ row: r, col: c, hp: cell.hp, type: 'tri', dir: cell.dir });
       } else {
@@ -633,7 +662,8 @@ function gridToJson() {
     initial_balls: stageSettings.initial_balls,
     star_thresholds: stageSettings.star_thresholds,
     bricks,
-    ball_items
+    ball_items,
+    laser_shooters
   };
 }
 
@@ -663,6 +693,11 @@ function jsonToGrid(data) {
   for (const item of (data.ball_items || [])) {
     if (item.row < ROWS && item.col < COLS) {
       grid[item.row][item.col] = { type: 'ball' };
+    }
+  }
+  for (const s of (data.laser_shooters || [])) {
+    if (s.row < ROWS && s.col < COLS) {
+      grid[s.row][s.col] = { type: 'laser_shooter', uses: s.uses || 10, damage: s.damage || 1, dirs: s.dirs || [0] };
     }
   }
   clearSelection();
@@ -794,7 +829,8 @@ document.addEventListener('keydown', e => {
   if (e.key === '2') { currentTool = 'tri'; updateToolUI(); }
   if (e.key === '3') { currentTool = 'ball'; updateToolUI(); }
   if (e.key === '4') { currentTool = 'missile'; updateToolUI(); }
-  if (e.key === '5' || e.key === 'e') { currentTool = 'eraser'; updateToolUI(); }
+  if (e.key === '5') { currentTool = 'laser'; updateToolUI(); }
+  if (e.key === '6' || e.key === 'e') { currentTool = 'eraser'; updateToolUI(); }
   if (e.key === 'Escape') clearSelection();
   if (e.key === 'Delete' && selectedCell) {
     grid[selectedCell.row][selectedCell.col] = null;
