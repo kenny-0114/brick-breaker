@@ -42,12 +42,16 @@ func _update_texture(cell_size: Vector2) -> void:
 	var tex_size: Vector2 = tex.get_size()
 	var scale_val: float = min(cell_size.x / tex_size.x, cell_size.y / tex_size.y) * 0.9
 	shooter_sprite.scale = Vector2(scale_val, scale_val)
-	# 1방향/2방향은 dirs[0]에 맞게 회전
+	# dirs를 int로 변환 (JSON 파싱 시 float으로 들어올 수 있음)
+	var int_dirs: Array[int] = []
+	for d in dirs:
+		int_dirs.append(int(d))
+	# 1방향: 해당 방향으로 회전
 	if dir_count == 1:
-		shooter_sprite.rotation_degrees = DIR_ROTATIONS.get(dirs[0], 0.0)
+		shooter_sprite.rotation_degrees = float(int_dirs[0]) * 90.0
 	elif dir_count == 2:
-		# 2방향: 첫 번째 방향 기준 회전 (0,2=세로 기본, 1,3=가로 90도)
-		if 1 in dirs or 3 in dirs:
+		# 2방향: 좌우(1,3)이면 90도 회전, 상하(0,2)는 기본
+		if 1 in int_dirs or 3 in int_dirs:
 			shooter_sprite.rotation_degrees = 90.0
 
 
@@ -73,7 +77,8 @@ func _on_body_entered(body: Node) -> void:
 
 # 각 방향으로 레이저를 발사한다.
 func _fire_lasers() -> void:
-	for dir in dirs:
+	for d in dirs:
+		var dir: int = int(d)
 		var result: Dictionary = _scan_direction(dir)
 		var beam: Node2D = LASER_BEAM_SCENE.instantiate()
 		beam.global_position = global_position
