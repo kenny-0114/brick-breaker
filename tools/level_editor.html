@@ -111,6 +111,14 @@
       <button class="dir-btn" data-dir="0">◣</button>
       <button class="dir-btn active" data-dir="3">◥</button>
     </div>
+
+    <h3 id="laserToolHeader" style="display:none;">Laser Opts</h3>
+    <div id="laserToolOpts" style="display:none;">
+      <div class="hp-control"><span style="font-size:11px;color:#99a;min-width:32px;">Uses</span><input type="number" id="laserUsesInput" value="10" min="1" max="999"></div>
+      <div class="hp-control" style="margin-top:4px;"><span style="font-size:11px;color:#99a;min-width:32px;">Dmg</span><input type="number" id="laserDmgInput" value="1" min="1" max="99"></div>
+      <div style="margin-top:6px;font-size:11px;color:#667;">Laser Dir</div>
+      <div class="dir-grid" id="laserDirGrid"></div>
+    </div>
   </div>
 
   <!-- Grid -->
@@ -151,6 +159,30 @@
           <button class="sel-dir-btn" data-dir="1">◢</button>
         </div>
       </div>
+      <!-- 레이저 슈터 전용 속성 -->
+      <div id="selLaserRow" style="display:none;">
+        <div class="prop-row"><label>Uses</label>
+          <div class="hp-control">
+            <button id="selUsesDec">-</button>
+            <input type="number" id="selUsesInput" value="10" min="1">
+            <button id="selUsesInc">+</button>
+          </div>
+        </div>
+        <div class="prop-row"><label>Damage</label>
+          <div class="hp-control">
+            <button id="selDmgDec">-</button>
+            <input type="number" id="selDmgInput" value="1" min="1">
+            <button id="selDmgInc">+</button>
+          </div>
+        </div>
+        <div class="prop-row"><label>Dirs</label></div>
+        <div class="sel-dir-grid" id="selLaserDirGrid">
+          <button class="sel-dir-btn" data-ldir="0">↑</button>
+          <button class="sel-dir-btn" data-ldir="1">→</button>
+          <button class="sel-dir-btn" data-ldir="2">↓</button>
+          <button class="sel-dir-btn" data-ldir="3">←</button>
+        </div>
+      </div>
       <button class="btn-danger" id="btnDeleteCell" style="width:100%;margin-top:8px;padding:6px;">Delete Cell</button>
     </div>
   </div>
@@ -176,6 +208,9 @@ let grid = []; // grid[row][col] = null | {type:'rect',hp} | {type:'tri',hp,dir}
 let currentTool = 'rect';
 let currentHp = 10;
 let currentDir = 3;
+let currentLaserUses = 10;
+let currentLaserDmg = 1;
+let currentLaserDirs = [0, 2]; // 기본 상하
 let selectedCell = null; // {row, col}
 let isDirty = false;
 let currentFileName = '';
@@ -462,7 +497,7 @@ function applyTool(row, col) {
     markDirty();
   } else if (currentTool === 'laser') {
     if (existing) { selectCell(row, col); return; }
-    grid[row][col] = { type: 'laser_shooter', uses: 10, damage: 1, dirs: [0, 2] };
+    grid[row][col] = { type: 'laser_shooter', uses: currentLaserUses, damage: currentLaserDmg, dirs: [...currentLaserDirs] };
     markDirty();
   } else if (currentTool === 'ball') {
     if (existing) { selectCell(row, col); return; }
@@ -522,15 +557,24 @@ function updateSelectionUI() {
   document.getElementById('selInfo').textContent = `Row ${selectedCell.row}, Col ${selectedCell.col}`;
   document.getElementById('selProps').style.display = 'block';
 
+  // 레이저 패널 기본 숨김
+  document.getElementById('selLaserRow').style.display = 'none';
+
   if (cell.type === 'ball') {
     document.getElementById('selType').textContent = 'Ball Item';
     document.getElementById('selHpRow').style.display = 'none';
     document.getElementById('selDirRow').style.display = 'none';
   } else if (cell.type === 'laser_shooter') {
     document.getElementById('selType').textContent = 'Laser Shooter';
-    document.getElementById('selHpRow').style.display = 'flex';
-    document.getElementById('selHpInput').value = cell.uses;
+    document.getElementById('selHpRow').style.display = 'none';
     document.getElementById('selDirRow').style.display = 'none';
+    document.getElementById('selLaserRow').style.display = 'block';
+    document.getElementById('selUsesInput').value = cell.uses;
+    document.getElementById('selDmgInput').value = cell.damage;
+    // 방향 토글 상태 업데이트
+    document.querySelectorAll('#selLaserDirGrid .sel-dir-btn').forEach(b => {
+      b.classList.toggle('active', (cell.dirs || []).includes(parseInt(b.dataset.ldir)));
+    });
   } else {
     document.getElementById('selType').textContent = cell.item === 'missile' ? 'Missile' : cell.type === 'tri' ? 'Triangle' : 'Rectangle';
     document.getElementById('selHpRow').style.display = 'flex';
@@ -551,7 +595,33 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
     document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentTool = btn.dataset.tool;
+    // 레이저 도구 선택 시 옵션 패널 표시
+    const show = currentTool === 'laser';
+    document.getElementById('laserToolHeader').style.display = show ? 'block' : 'none';
+    document.getElementById('laserToolOpts').style.display = show ? 'block' : 'none';
   });
+});
+
+// ===== 레이저 도구 옵션 =====
+document.getElementById('laserUsesInput').addEventListener('change', e => { currentLaserUses = Math.max(1, parseInt(e.target.value) || 10); });
+document.getElementById('laserDmgInput').addEventListener('change', e => { currentLaserDmg = Math.max(1, parseInt(e.target.value) || 1); });
+
+// 레이저 방향 토글 버튼 (배치 시)
+const laserDirGridEl = document.getElementById('laserDirGrid');
+const LASER_DIR_LABELS = {0: '↑', 1: '→', 2: '↓', 3: '←'};
+[0, 1, 2, 3].forEach(d => {
+  const btn = document.createElement('button');
+  btn.className = 'dir-btn' + (currentLaserDirs.includes(d) ? ' active' : '');
+  btn.dataset.ldir = d;
+  btn.textContent = LASER_DIR_LABELS[d];
+  btn.addEventListener('click', () => {
+    const idx = currentLaserDirs.indexOf(d);
+    if (idx >= 0) { if (currentLaserDirs.length > 1) currentLaserDirs.splice(idx, 1); }
+    else currentLaserDirs.push(d);
+    currentLaserDirs.sort();
+    laserDirGridEl.querySelectorAll('.dir-btn').forEach(b => b.classList.toggle('active', currentLaserDirs.includes(parseInt(b.dataset.ldir))));
+  });
+  laserDirGridEl.appendChild(btn);
 });
 
 document.getElementById('hpInput').addEventListener('change', e => { currentHp = parseInt(e.target.value) || 1; });
@@ -607,6 +677,33 @@ document.getElementById('btnDeleteCell').addEventListener('click', () => {
   grid[selectedCell.row][selectedCell.col] = null;
   markDirty();
   clearSelection();
+});
+
+// ===== 선택된 레이저 슈터 속성 편집 =====
+function getSelLaser() {
+  if (!selectedCell) return null;
+  const c = grid[selectedCell.row][selectedCell.col];
+  return (c && c.type === 'laser_shooter') ? c : null;
+}
+document.getElementById('selUsesInput').addEventListener('change', e => { const c = getSelLaser(); if (c) { c.uses = Math.max(1, parseInt(e.target.value) || 10); markDirty(); render(); } });
+document.getElementById('selUsesInc').addEventListener('click', () => { const c = getSelLaser(); if (c) { c.uses = Math.min(999, c.uses + (event.shiftKey ? 10 : 1)); markDirty(); updateSelectionUI(); } });
+document.getElementById('selUsesDec').addEventListener('click', () => { const c = getSelLaser(); if (c) { c.uses = Math.max(1, c.uses - (event.shiftKey ? 10 : 1)); markDirty(); updateSelectionUI(); } });
+document.getElementById('selDmgInput').addEventListener('change', e => { const c = getSelLaser(); if (c) { c.damage = Math.max(1, parseInt(e.target.value) || 1); markDirty(); render(); } });
+document.getElementById('selDmgInc').addEventListener('click', () => { const c = getSelLaser(); if (c) { c.damage = Math.min(99, c.damage + 1); markDirty(); updateSelectionUI(); } });
+document.getElementById('selDmgDec').addEventListener('click', () => { const c = getSelLaser(); if (c) { c.damage = Math.max(1, c.damage - 1); markDirty(); updateSelectionUI(); } });
+// 선택된 레이저 방향 토글
+document.querySelectorAll('#selLaserDirGrid .sel-dir-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const c = getSelLaser();
+    if (!c) return;
+    const d = parseInt(btn.dataset.ldir);
+    const idx = c.dirs.indexOf(d);
+    if (idx >= 0) { if (c.dirs.length > 1) c.dirs.splice(idx, 1); }
+    else c.dirs.push(d);
+    c.dirs.sort();
+    markDirty();
+    updateSelectionUI();
+  });
 });
 
 // ===== Stage Settings =====
