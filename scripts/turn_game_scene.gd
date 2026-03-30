@@ -7,6 +7,8 @@ enum State { AIMING, FIRING, WAITING, TURN_END }
 const BALL_SCENE := preload("res://scenes/objects/ball.tscn")
 const BRICK_SCENE := preload("res://scenes/objects/brick.tscn")
 const BALL_ITEM_SCENE := preload("res://scenes/objects/ball_item.tscn")
+const MISSILE_COUNT := 5
+const MISSILE_FIRE_INTERVAL := 0.05
 const GRID_COLS := 10
 const BRICK_MARGIN := 0.0
 const GRID_TOP_OFFSET := 84.0
@@ -110,6 +112,9 @@ func _load_level(level: int) -> void:
 			(col + 0.5) * cell_width,
 			GRID_TOP_OFFSET + (row + 0.5) * cell_height
 		)
+		# 아이템 속성 파싱
+		var item_type: String = str(brick_data.get("item", ""))
+		brick.item = item_type
 		brick_container.add_child(brick)
 		if brick_type == "tri":
 			# 직각삼각형 벽돌
@@ -259,14 +264,22 @@ func _check_game_over() -> bool:
 	return false
 
 
-# 벽돌 파괴 시 호출된다. 점수를 추가하고 팝업을 표시한다.
-func _on_brick_destroyed(pos: Vector2) -> void:
+# 벽돌 파괴 시 호출된다. 점수를 추가하고 아이템 효과를 발동한다.
+func _on_brick_destroyed(pos: Vector2, item: String = "") -> void:
 	_remaining_bricks -= 1
 	var points := GameManager.add_brick_score()
 	_spawn_particles(pos)
 	_spawn_score_popup(pos, points, GameManager.combo)
+	# 미사일 아이템 발동
+	if item == "missile":
+		_activate_missile(pos)
 	if _remaining_bricks <= 0 and (_state == State.WAITING or _state == State.FIRING):
 		_recall_all_balls.call_deferred()
+
+
+# 미사일 아이템을 발동한다. (Task 5에서 구현)
+func _activate_missile(_origin_pos: Vector2) -> void:
+	pass
 
 
 # 스테이지 클리어 시 모든 공을 즉시 회수 지점으로 직선 이동시킨다.
