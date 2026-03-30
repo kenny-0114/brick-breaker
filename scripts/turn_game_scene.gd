@@ -122,7 +122,7 @@ func _load_level(level: int) -> void:
 			var col_shape: CollisionShape2D = brick.get_node("CollisionShape2D")
 			col_shape.shape = col_shape.shape.duplicate()
 			col_shape.shape.size = Vector2(cell_width, cell_height)
-			brick.setup(hp)
+			brick.setup(hp, cell_size)
 		if hp != -1:
 			_remaining_bricks += 1
 			brick.brick_destroyed.connect(_on_brick_destroyed)

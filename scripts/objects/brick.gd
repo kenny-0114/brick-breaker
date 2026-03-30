@@ -46,6 +46,8 @@ const TRI_CENTROID := {
 }
 
 const TILE_SIZE := 70.0
+const ITEM_BOX_TEXTURE := preload("res://assets/images/items/item_box_frame.png")
+const MISSILE_ICON_TEXTURE := preload("res://kenney_space-shooter-extension/PNG/Sprites X2/Missiles/spaceMissiles_007.png")
 
 var hp: int = 1
 var _is_destroyed := false
@@ -60,7 +62,7 @@ var item: String = ""
 
 
 # 사각형 벽돌 초기화.
-func setup(brick_hp: int) -> void:
+func setup(brick_hp: int, cell_size: Vector2 = Vector2(48, 48)) -> void:
 	hp = brick_hp
 	_is_triangle = false
 	if hp == -1:
@@ -69,6 +71,9 @@ func setup(brick_hp: int) -> void:
 	else:
 		_update_color_by_hp()
 		_update_hp_label()
+	# 아이템이 있으면 아이템 상자 외형으로 교체한다.
+	if item != "":
+		_setup_item_box(cell_size)
 
 
 # 직각삼각형 벽돌 초기화. cell_size로 크기를 맞추고 dir로 방향을 정한다.
@@ -224,3 +229,24 @@ func _play_hit_effect() -> void:
 	# 2) 스케일 펀치 — 살짝 커졌다 원래 크기로 (탄력감)
 	scale = Vector2(1.15, 1.15)
 	_hit_tween.tween_property(self, "scale", Vector2.ONE, 0.12).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+
+
+# 아이템 상자 외형으로 렌더링한다. 일반 벽돌 스프라이트를 숨기고 아이템 상자를 표시한다.
+func _setup_item_box(cell_size: Vector2) -> void:
+	# 일반 벽돌 스프라이트를 아이템 상자 프레임으로 교체한다.
+	sprite.texture = ITEM_BOX_TEXTURE
+	var tex_size: Vector2 = ITEM_BOX_TEXTURE.get_size()
+	sprite.scale = Vector2(cell_size.x / tex_size.x, cell_size.y / tex_size.y)
+
+	# 미사일 아이콘을 45도 기울여서 중앙에 배치한다.
+	var icon := Sprite2D.new()
+	icon.texture = MISSILE_ICON_TEXTURE
+	var icon_tex_size := MISSILE_ICON_TEXTURE.get_size()
+	var icon_scale := min(cell_size.x * 0.55 / icon_tex_size.x, cell_size.y * 0.55 / icon_tex_size.y)
+	icon.scale = Vector2(icon_scale, icon_scale)
+	icon.rotation_degrees = 45.0
+	icon.position = Vector2(0, -2)
+	add_child(icon)
+
+	# HP 라벨을 아이콘 위에 표시한다.
+	move_child(hp_label, -1)
