@@ -3,14 +3,8 @@
 /android/
 .superpowers/
 .bkit/
-kenney_puzzle-pack-2/
-kenney_ui-pack/
-kenney-pack/
+kenney-assets/
 sounds_resource/
-kenney_game-icons/
-kenney_tanks/
-kenney_space-shooter-extension/
-kenney-res/
 
 # 개발 임시 파일
 .playwright-mcp/

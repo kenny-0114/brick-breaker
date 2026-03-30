@@ -47,7 +47,7 @@ const TRI_CENTROID := {
 
 const TILE_SIZE := 70.0
 const ITEM_BOX_TEXTURE := preload("res://assets/images/items/item_box_frame.png")
-const MISSILE_ICON_TEXTURE := preload("res://kenney_space-shooter-extension/PNG/Sprites X2/Missiles/spaceMissiles_007.png")
+const MISSILE_ICON_TEXTURE := preload("res://kenney-assets/kenney_space-shooter-extension/PNG/Sprites X2/Missiles/spaceMissiles_007.png")
 
 var hp: int = 1
 var _is_destroyed := false
