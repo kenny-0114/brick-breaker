@@ -157,7 +157,9 @@ func hit() -> void:
 		brick_destroyed.emit(global_position, item)
 		queue_free()
 	else:
-		_update_color_by_hp()
+		# 아이템 상자는 텍스처를 유지한다.
+		if item == "":
+			_update_color_by_hp()
 		_update_hp_label()
 		_play_hit_effect()
 
