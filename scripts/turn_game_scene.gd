@@ -282,7 +282,7 @@ func _on_brick_destroyed(pos: Vector2, item: String = "") -> void:
 # 미사일 아이템을 발동한다. 랜덤 벽돌에 락온 후 미사일을 순차 발사한다.
 func _activate_missile(origin_pos: Vector2) -> void:
 	# 파괴 가능 벽돌 중 랜덤 최대 5개 선택
-	var targets := _select_missile_targets()
+	var targets: Array = _select_missile_targets()
 	if targets.is_empty():
 		return
 
@@ -315,8 +315,8 @@ func _spawn_lockon_marker(target: Node2D, delay: float) -> void:
 	marker.z_index = 60
 	marker.position = target.position
 	# 셀 크기에 맞게 마커 크기 조절
-	var tex_size := CROSSHAIR_TEXTURE.get_size()
-	var target_scale := _cell_height * 1.2 / tex_size.x
+	var tex_size: Vector2 = CROSSHAIR_TEXTURE.get_size()
+	var target_scale: float = _cell_height * 1.2 / tex_size.x
 	brick_container.get_parent().add_child(marker)
 
 	# 지연 후 스케일 펀치 등장 + 회전

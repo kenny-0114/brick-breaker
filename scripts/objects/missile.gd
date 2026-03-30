@@ -28,7 +28,7 @@ func setup(target_brick: Node, target_position: Vector2) -> void:
 # 타겟 방향으로 회전하고 비행을 시작한다.
 func launch() -> void:
 	# 타겟 방향으로 회전
-	var angle := global_position.angle_to_point(_target_pos)
+	var angle: float = global_position.angle_to_point(_target_pos)
 	missile_sprite.rotation = angle + PI / 2.0
 
 	# 연기 파티클 시작

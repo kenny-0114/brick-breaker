@@ -242,7 +242,7 @@ func _setup_item_box(cell_size: Vector2) -> void:
 	var icon := Sprite2D.new()
 	icon.texture = MISSILE_ICON_TEXTURE
 	var icon_tex_size := MISSILE_ICON_TEXTURE.get_size()
-	var icon_scale := min(cell_size.x * 0.55 / icon_tex_size.x, cell_size.y * 0.55 / icon_tex_size.y)
+	var icon_scale: float = min(cell_size.x * 0.55 / icon_tex_size.x, cell_size.y * 0.55 / icon_tex_size.y)
 	icon.scale = Vector2(icon_scale, icon_scale)
 	icon.rotation_degrees = 45.0
 	icon.position = Vector2(0, -2)
