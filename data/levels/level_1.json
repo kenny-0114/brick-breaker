@@ -1,24 +1,92 @@
 {
   "ball_speed": 400,
   "initial_balls": 50,
-  "star_thresholds": [10, 7, 4],
+  "star_thresholds": [
+    10,
+    7,
+    4
+  ],
   "bricks": [
-    {"row": 3, "col": 2, "hp": 10},
-    {"row": 3, "col": 4, "hp": 10},
-    {"row": 3, "col": 7, "hp": 10},
-    {"row": 4, "col": 2, "hp": 10},
-    {"row": 4, "col": 4, "hp": 5, "item": "missile"},
-    {"row": 4, "col": 7, "hp": 10},
-    {"row": 5, "col": 2, "hp": 10},
-    {"row": 5, "col": 3, "hp": 10},
-    {"row": 5, "col": 4, "hp": 10},
-    {"row": 5, "col": 7, "hp": 10},
-    {"row": 6, "col": 2, "hp": 10},
-    {"row": 6, "col": 4, "hp": 10},
-    {"row": 6, "col": 7, "hp": 3, "item": "missile"},
-    {"row": 7, "col": 2, "hp": 10},
-    {"row": 7, "col": 4, "hp": 10},
-    {"row": 7, "col": 7, "hp": 10}
+    {
+      "row": 3,
+      "col": 2,
+      "hp": 10
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "hp": 10
+    },
+    {
+      "row": 3,
+      "col": 7,
+      "hp": 10
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "hp": 10
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "hp": 10
+    },
+    {
+      "row": 4,
+      "col": 7,
+      "hp": 10
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "hp": 10
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "hp": 10
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "hp": 10
+    },
+    {
+      "row": 5,
+      "col": 7,
+      "hp": 10
+    },
+    {
+      "row": 6,
+      "col": 2,
+      "hp": 10
+    },
+    {
+      "row": 6,
+      "col": 4,
+      "hp": 10
+    },
+    {
+      "row": 6,
+      "col": 7,
+      "hp": 10
+    },
+    {
+      "row": 7,
+      "col": 2,
+      "hp": 10
+    },
+    {
+      "row": 7,
+      "col": 4,
+      "hp": 10
+    },
+    {
+      "row": 7,
+      "col": 7,
+      "hp": 10
+    }
   ],
   "ball_items": []
 }
