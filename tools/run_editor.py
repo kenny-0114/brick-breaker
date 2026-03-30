@@ -56,7 +56,7 @@ class EditorHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     os.chdir(PROJECT_ROOT)
     server = http.server.HTTPServer(("localhost", PORT), EditorHandler)
-    url = f"http://localhost:{PORT}/mockup/level_editor.html"
+    url = f"http://localhost:{PORT}/tools/level_editor.html"
     print(f"Level Editor: {url}")
     print("종료: Ctrl+C")
     webbrowser.open(url)
