@@ -10,8 +10,5 @@ sounds_resource/
 .playwright-mcp/
 skills-lock.json
 
-# 목업 임시 파일 (스크린샷, .import)
-mockup/**/*.png
-mockup/**/*.png.import
-mockup_clear_*.png
-mockup_clear_*.png.import
+# 목업 (테스트용)
+mockup/
