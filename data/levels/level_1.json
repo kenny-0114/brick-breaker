@@ -89,8 +89,5 @@
     }
   ],
   "ball_items": [],
-  "laser_shooters": [
-    {"row": 2, "col": 5, "uses": 5, "damage": 1, "dirs": [0, 2]},
-    {"row": 6, "col": 3, "uses": 10, "damage": 1, "dirs": [0, 1, 2, 3]}
-  ]
+  "laser_shooters": []
 }

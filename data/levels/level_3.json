@@ -8,63 +8,6 @@
   ],
   "bricks": [
     {
-      "row": 0,
-      "col": 0,
-      "hp": 30
-    },
-    {
-      "row": 0,
-      "col": 1,
-      "hp": 35
-    },
-    {
-      "row": 0,
-      "col": 2,
-      "hp": 40
-    },
-    {
-      "row": 0,
-      "col": 3,
-      "hp": 45
-    },
-    {
-      "row": 0,
-      "col": 4,
-      "hp": 50
-    },
-    {
-      "row": 0,
-      "col": 5,
-      "hp": 50
-    },
-    {
-      "row": 0,
-      "col": 6,
-      "hp": 45
-    },
-    {
-      "row": 0,
-      "col": 7,
-      "hp": 40
-    },
-    {
-      "row": 0,
-      "col": 8,
-      "hp": 35
-    },
-    {
-      "row": 0,
-      "col": 9,
-      "hp": 30
-    },
-    {
-      "row": 1,
-      "col": 0,
-      "hp": 10,
-      "type": "tri",
-      "dir": 3
-    },
-    {
       "row": 1,
       "col": 1,
       "hp": 25
@@ -103,13 +46,6 @@
       "row": 1,
       "col": 8,
       "hp": 25
-    },
-    {
-      "row": 1,
-      "col": 9,
-      "hp": 10,
-      "type": "tri",
-      "dir": 2
     },
     {
       "row": 2,
@@ -274,5 +210,138 @@
       "item": "missile"
     }
   ],
-  "ball_items": []
+  "ball_items": [],
+  "laser_shooters": [
+    {
+      "row": 0,
+      "col": 1,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        2
+      ]
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        2
+      ]
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        2
+      ]
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        2
+      ]
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        2
+      ]
+    },
+    {
+      "row": 0,
+      "col": 6,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        2
+      ]
+    },
+    {
+      "row": 0,
+      "col": 7,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        2
+      ]
+    },
+    {
+      "row": 0,
+      "col": 8,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        2
+      ]
+    },
+    {
+      "row": 7,
+      "col": 1,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        1
+      ]
+    },
+    {
+      "row": 7,
+      "col": 8,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        3
+      ]
+    },
+    {
+      "row": 8,
+      "col": 2,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        0
+      ]
+    },
+    {
+      "row": 8,
+      "col": 4,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        0,
+        2
+      ]
+    },
+    {
+      "row": 8,
+      "col": 7,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        1,
+        3
+      ]
+    },
+    {
+      "row": 10,
+      "col": 4,
+      "uses": 40,
+      "damage": 1,
+      "dirs": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  ]
 }
