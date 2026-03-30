@@ -2,13 +2,13 @@
 # 미사일 비행 노드. 타겟까지 직선 비행 후 폭발 이펙트를 재생하고 소멸한다.
 extends Node2D
 
-const CROSSHAIR_TEXTURE := preload("res://kenney-assets/kenney-res/crosshair_red_large.png")
+const CROSSHAIR_TEXTURE := preload("res://assets/images/items/effects/crosshair_red_large.png")
 const EXPLOSION_TEXTURES := [
-	preload("res://kenney-assets/kenney-res/explosion1.png"),
-	preload("res://kenney-assets/kenney-res/explosion2.png"),
-	preload("res://kenney-assets/kenney-res/explosion3.png"),
+	preload("res://assets/images/items/effects/explosion1.png"),
+	preload("res://assets/images/items/effects/explosion2.png"),
+	preload("res://assets/images/items/effects/explosion3.png"),
 ]
-const SMOKE_TEXTURE := preload("res://kenney-assets/kenney_space-shooter-extension/PNG/Sprites/Effects/spaceEffects_009.png")
+const SMOKE_TEXTURE := preload("res://assets/images/items/effects/spaceEffects_009.png")
 const FLIGHT_DURATION := 0.35
 const SMOKE_LIFETIME := 0.3
 
