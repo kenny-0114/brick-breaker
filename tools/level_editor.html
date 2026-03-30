@@ -176,12 +176,7 @@
           </div>
         </div>
         <div class="prop-row"><label>Dirs</label></div>
-        <div class="sel-dir-grid" id="selLaserDirGrid">
-          <button class="sel-dir-btn" data-ldir="0">↑</button>
-          <button class="sel-dir-btn" data-ldir="1">→</button>
-          <button class="sel-dir-btn" data-ldir="2">↓</button>
-          <button class="sel-dir-btn" data-ldir="3">←</button>
-        </div>
+        <div class="sel-dir-grid" id="selLaserDirGrid"></div>
       </div>
       <button class="btn-danger" id="btnDeleteCell" style="width:100%;margin-top:8px;padding:6px;">Delete Cell</button>
     </div>
@@ -571,10 +566,8 @@ function updateSelectionUI() {
     document.getElementById('selLaserRow').style.display = 'block';
     document.getElementById('selUsesInput').value = cell.uses;
     document.getElementById('selDmgInput').value = cell.damage;
-    // 방향 토글 상태 업데이트
-    document.querySelectorAll('#selLaserDirGrid .sel-dir-btn').forEach(b => {
-      b.classList.toggle('active', (cell.dirs || []).includes(parseInt(b.dataset.ldir)));
-    });
+    // 방향 프리셋 상태 업데이트
+    updateLaserPresetUI(document.getElementById('selLaserDirGrid'), cell.dirs || [0]);
   } else {
     document.getElementById('selType').textContent = cell.item === 'missile' ? 'Missile' : cell.type === 'tri' ? 'Triangle' : 'Rectangle';
     document.getElementById('selHpRow').style.display = 'flex';
@@ -606,20 +599,31 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
 document.getElementById('laserUsesInput').addEventListener('change', e => { currentLaserUses = Math.max(1, parseInt(e.target.value) || 10); });
 document.getElementById('laserDmgInput').addEventListener('change', e => { currentLaserDmg = Math.max(1, parseInt(e.target.value) || 1); });
 
-// 레이저 방향 토글 버튼 (배치 시)
+// 레이저 방향 프리셋 (대칭 조합만)
 const laserDirGridEl = document.getElementById('laserDirGrid');
-const LASER_DIR_LABELS = {0: '↑', 1: '→', 2: '↓', 3: '←'};
-[0, 1, 2, 3].forEach(d => {
+const LASER_PRESETS = [
+  { label: '↑', dirs: [0] },
+  { label: '→', dirs: [1] },
+  { label: '↓', dirs: [2] },
+  { label: '←', dirs: [3] },
+  { label: '↕', dirs: [0, 2] },
+  { label: '↔', dirs: [1, 3] },
+  { label: '✚', dirs: [0, 1, 2, 3] },
+];
+function updateLaserPresetUI(container, activeDirs) {
+  container.querySelectorAll('.dir-btn').forEach(b => {
+    const preset = JSON.parse(b.dataset.preset);
+    b.classList.toggle('active', JSON.stringify(preset) === JSON.stringify(activeDirs));
+  });
+}
+LASER_PRESETS.forEach(p => {
   const btn = document.createElement('button');
-  btn.className = 'dir-btn' + (currentLaserDirs.includes(d) ? ' active' : '');
-  btn.dataset.ldir = d;
-  btn.textContent = LASER_DIR_LABELS[d];
+  btn.className = 'dir-btn' + (JSON.stringify(p.dirs) === JSON.stringify(currentLaserDirs) ? ' active' : '');
+  btn.dataset.preset = JSON.stringify(p.dirs);
+  btn.textContent = p.label;
   btn.addEventListener('click', () => {
-    const idx = currentLaserDirs.indexOf(d);
-    if (idx >= 0) { if (currentLaserDirs.length > 1) currentLaserDirs.splice(idx, 1); }
-    else currentLaserDirs.push(d);
-    currentLaserDirs.sort();
-    laserDirGridEl.querySelectorAll('.dir-btn').forEach(b => b.classList.toggle('active', currentLaserDirs.includes(parseInt(b.dataset.ldir))));
+    currentLaserDirs = [...p.dirs];
+    updateLaserPresetUI(laserDirGridEl, currentLaserDirs);
   });
   laserDirGridEl.appendChild(btn);
 });
@@ -691,19 +695,21 @@ document.getElementById('selUsesDec').addEventListener('click', () => { const c 
 document.getElementById('selDmgInput').addEventListener('change', e => { const c = getSelLaser(); if (c) { c.damage = Math.max(1, parseInt(e.target.value) || 1); markDirty(); render(); } });
 document.getElementById('selDmgInc').addEventListener('click', () => { const c = getSelLaser(); if (c) { c.damage = Math.min(99, c.damage + 1); markDirty(); updateSelectionUI(); } });
 document.getElementById('selDmgDec').addEventListener('click', () => { const c = getSelLaser(); if (c) { c.damage = Math.max(1, c.damage - 1); markDirty(); updateSelectionUI(); } });
-// 선택된 레이저 방향 토글
-document.querySelectorAll('#selLaserDirGrid .sel-dir-btn').forEach(btn => {
+// 선택된 레이저 방향 프리셋 버튼 생성
+const selLaserDirGridEl = document.getElementById('selLaserDirGrid');
+LASER_PRESETS.forEach(p => {
+  const btn = document.createElement('button');
+  btn.className = 'sel-dir-btn';
+  btn.dataset.preset = JSON.stringify(p.dirs);
+  btn.textContent = p.label;
   btn.addEventListener('click', () => {
     const c = getSelLaser();
     if (!c) return;
-    const d = parseInt(btn.dataset.ldir);
-    const idx = c.dirs.indexOf(d);
-    if (idx >= 0) { if (c.dirs.length > 1) c.dirs.splice(idx, 1); }
-    else c.dirs.push(d);
-    c.dirs.sort();
+    c.dirs = [...p.dirs];
     markDirty();
     updateSelectionUI();
   });
+  selLaserDirGridEl.appendChild(btn);
 });
 
 // ===== Stage Settings =====
