@@ -1,0 +1,43 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/laser_shooter.gd" id="1_shooter"]
+[ext_resource type="Texture2D" path="res://assets/images/items/missile/laser_shooter_4dir.png" id="2_shooter_tex"]
+[ext_resource type="FontFile" path="res://assets/fonts/Kenney Future.ttf" id="3_font"]
+
+[sub_resource type="CircleShape2D" id="SubResource_shape"]
+radius = 18.0
+
+[node name="LaserShooter" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_shooter")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_shooter_tex")
+
+[node name="UsesLabel" type="Label" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -12.0
+offset_right = 25.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("SubResource_shape")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
