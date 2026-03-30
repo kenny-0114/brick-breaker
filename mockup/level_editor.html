@@ -92,6 +92,7 @@
     <button class="tool-btn active" data-tool="rect">□ Rect</button>
     <button class="tool-btn" data-tool="tri">△ Tri</button>
     <button class="tool-btn" data-tool="ball">⊕ Ball</button>
+    <button class="tool-btn" data-tool="missile">🚀 Missile</button>
     <button class="tool-btn" data-tool="eraser">✕ Erase</button>
 
     <h3>HP</h3>
@@ -245,6 +246,9 @@ function render() {
         ctx.fillText('+', x + cellSize/2, y + cellSize/2);
       } else if (cell.type === 'tri') {
         drawTriBrick(x, y, cell);
+      } else if (cell.item === 'missile') {
+        // Missile item box
+        drawItemBox(x, y, cell);
       } else {
         // Rect brick
         const colorKey = getHpColor(cell.hp);
@@ -313,6 +317,95 @@ function drawTriBrick(x, y, cell) {
   drawHpText(tx, ty, cell.hp);
 }
 
+function drawItemBox(x, y, cell) {
+  const s = cellSize;
+  const cx = x + s / 2, cy = y + s / 2;
+  // 금속 프레임
+  ctx.fillStyle = '#5a6a7a';
+  ctx.beginPath();
+  ctx.roundRect(x + 1, y + 1, s - 2, s - 2, 3);
+  ctx.fill();
+  // 프레임 하이라이트
+  ctx.fillStyle = 'rgba(255,255,255,0.1)';
+  ctx.fillRect(x + 2, y + 2, s - 4, 2);
+  // 내부 다크
+  ctx.fillStyle = '#1a2634';
+  ctx.beginPath();
+  ctx.roundRect(x + 4, y + 4, s - 8, s - 8, 2);
+  ctx.fill();
+  // 유리 패널
+  const grd = ctx.createRadialGradient(cx - s * 0.08, cy - s * 0.08, 0, cx, cy, s * 0.45);
+  grd.addColorStop(0, 'rgba(140,200,255,0.3)');
+  grd.addColorStop(0.5, 'rgba(70,130,190,0.18)');
+  grd.addColorStop(1, 'rgba(20,50,90,0.45)');
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.roundRect(x + 5, y + 5, s - 10, s - 10, 2);
+  ctx.fill();
+  // 유리 광택
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath();
+  ctx.moveTo(x + 8, y + 7);
+  ctx.quadraticCurveTo(cx, y + 5, x + s - 8, y + 12);
+  ctx.lineTo(x + s - 8, y + 7);
+  ctx.quadraticCurveTo(cx, y + 4, x + 8, y + 7);
+  ctx.fill();
+  // 나사 4개
+  const screwR = s * 0.04;
+  [[x+5, y+5],[x+s-5, y+5],[x+5, y+s-5],[x+s-5, y+s-5]].forEach(([sx, sy]) => {
+    ctx.fillStyle = '#4a5a6a';
+    ctx.beginPath();
+    ctx.arc(sx, sy, screwR + 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#2a3a4a';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(sx - screwR, sy);
+    ctx.lineTo(sx + screwR, sy);
+    ctx.stroke();
+  });
+  // 미사일 아이콘 (45도 회전)
+  ctx.save();
+  ctx.translate(cx, cy - 1);
+  ctx.rotate(Math.PI / 4);
+  const mw = s * 0.18, mh = s * 0.38;
+  // 몸체
+  ctx.fillStyle = '#a0aec0';
+  ctx.beginPath();
+  ctx.roundRect(-mw, -mh / 2, mw * 2, mh, mw * 0.5);
+  ctx.fill();
+  // 탄두
+  ctx.fillStyle = '#c53030';
+  ctx.beginPath();
+  ctx.moveTo(0, -mh / 2 - mw * 0.8);
+  ctx.lineTo(-mw, -mh / 2);
+  ctx.lineTo(mw, -mh / 2);
+  ctx.closePath();
+  ctx.fill();
+  // 날개
+  ctx.fillStyle = '#718096';
+  ctx.beginPath();
+  ctx.moveTo(-mw, mh * 0.25);
+  ctx.lineTo(-mw - mw * 0.6, mh * 0.45);
+  ctx.lineTo(-mw, mh * 0.38);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(mw, mh * 0.25);
+  ctx.lineTo(mw + mw * 0.6, mh * 0.45);
+  ctx.lineTo(mw, mh * 0.38);
+  ctx.closePath();
+  ctx.fill();
+  // 창문
+  ctx.fillStyle = 'rgba(99,179,237,0.8)';
+  ctx.beginPath();
+  ctx.arc(0, -mh * 0.15, mw * 0.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  // HP 텍스트
+  drawHpText(cx, y + s - s * 0.18, cell.hp);
+}
+
 function drawHpText(x, y, hp) {
   ctx.fillStyle = '#fff';
   ctx.font = `bold ${cellSize * 0.28}px sans-serif`;
@@ -344,6 +437,10 @@ function applyTool(row, col) {
   } else if (currentTool === 'tri') {
     if (existing) { selectCell(row, col); return; }
     grid[row][col] = { type: 'tri', hp: currentHp, dir: currentDir };
+    markDirty();
+  } else if (currentTool === 'missile') {
+    if (existing) { selectCell(row, col); return; }
+    grid[row][col] = { type: 'rect', hp: currentHp, item: 'missile' };
     markDirty();
   } else if (currentTool === 'ball') {
     if (existing) { selectCell(row, col); return; }
@@ -408,7 +505,7 @@ function updateSelectionUI() {
     document.getElementById('selHpRow').style.display = 'none';
     document.getElementById('selDirRow').style.display = 'none';
   } else {
-    document.getElementById('selType').textContent = cell.type === 'tri' ? 'Triangle' : 'Rectangle';
+    document.getElementById('selType').textContent = cell.item === 'missile' ? 'Missile' : cell.type === 'tri' ? 'Triangle' : 'Rectangle';
     document.getElementById('selHpRow').style.display = 'flex';
     document.getElementById('selHpInput').value = cell.hp;
     if (cell.type === 'tri') {
@@ -525,7 +622,9 @@ function gridToJson() {
       } else if (cell.type === 'tri') {
         bricks.push({ row: r, col: c, hp: cell.hp, type: 'tri', dir: cell.dir });
       } else {
-        bricks.push({ row: r, col: c, hp: cell.hp });
+        const brick = { row: r, col: c, hp: cell.hp };
+        if (cell.item) brick.item = cell.item;
+        bricks.push(brick);
       }
     }
   }
@@ -555,7 +654,9 @@ function jsonToGrid(data) {
       if (b.type === 'tri') {
         grid[b.row][b.col] = { type: 'tri', hp: b.hp, dir: b.dir || 0 };
       } else {
-        grid[b.row][b.col] = { type: 'rect', hp: b.hp };
+        const cell = { type: 'rect', hp: b.hp };
+        if (b.item) cell.item = b.item;
+        grid[b.row][b.col] = cell;
       }
     }
   }
@@ -692,7 +793,8 @@ document.addEventListener('keydown', e => {
   if (e.key === '1') { currentTool = 'rect'; updateToolUI(); }
   if (e.key === '2') { currentTool = 'tri'; updateToolUI(); }
   if (e.key === '3') { currentTool = 'ball'; updateToolUI(); }
-  if (e.key === '4' || e.key === 'e') { currentTool = 'eraser'; updateToolUI(); }
+  if (e.key === '4') { currentTool = 'missile'; updateToolUI(); }
+  if (e.key === '5' || e.key === 'e') { currentTool = 'eraser'; updateToolUI(); }
   if (e.key === 'Escape') clearSelection();
   if (e.key === 'Delete' && selectedCell) {
     grid[selectedCell.row][selectedCell.col] = null;
