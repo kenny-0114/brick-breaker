@@ -7,6 +7,8 @@ enum State { AIMING, FIRING, WAITING, TURN_END }
 const BALL_SCENE := preload("res://scenes/objects/ball.tscn")
 const BRICK_SCENE := preload("res://scenes/objects/brick.tscn")
 const BALL_ITEM_SCENE := preload("res://scenes/objects/ball_item.tscn")
+const MISSILE_SCENE := preload("res://scenes/objects/missile.tscn")
+const CROSSHAIR_TEXTURE := preload("res://kenney-res/crosshair_red_large.png")
 const MISSILE_COUNT := 5
 const MISSILE_FIRE_INTERVAL := 0.05
 const GRID_COLS := 10
@@ -277,9 +279,70 @@ func _on_brick_destroyed(pos: Vector2, item: String = "") -> void:
 		_recall_all_balls.call_deferred()
 
 
-# 미사일 아이템을 발동한다. (Task 5에서 구현)
-func _activate_missile(_origin_pos: Vector2) -> void:
-	pass
+# 미사일 아이템을 발동한다. 랜덤 벽돌에 락온 후 미사일을 순차 발사한다.
+func _activate_missile(origin_pos: Vector2) -> void:
+	# 파괴 가능 벽돌 중 랜덤 최대 5개 선택
+	var targets := _select_missile_targets()
+	if targets.is_empty():
+		return
+
+	# 락온 마커 표시
+	for i in range(targets.size()):
+		var target: StaticBody2D = targets[i]
+		_spawn_lockon_marker(target, i * 0.06)
+
+	# 미사일 순차 발사
+	for i in range(targets.size()):
+		var target: StaticBody2D = targets[i]
+		_spawn_missile(origin_pos, target, i * MISSILE_FIRE_INTERVAL + 0.1)
+
+
+# 파괴 가능 벽돌 중 랜덤으로 최대 MISSILE_COUNT개를 선택한다.
+func _select_missile_targets() -> Array:
+	var candidates: Array = []
+	for brick in brick_container.get_children():
+		if brick.hp > 0 and brick.hp != -1 and not brick._is_destroyed:
+			candidates.append(brick)
+	candidates.shuffle()
+	return candidates.slice(0, MISSILE_COUNT)
+
+
+# 타겟 벽돌 위에 락온 마커를 표시한다. 스케일 펀치 + 회전 애니메이션.
+func _spawn_lockon_marker(target: Node2D, delay: float) -> void:
+	var marker := Sprite2D.new()
+	marker.texture = CROSSHAIR_TEXTURE
+	marker.scale = Vector2.ZERO
+	marker.z_index = 60
+	marker.position = target.position
+	# 셀 크기에 맞게 마커 크기 조절
+	var tex_size := CROSSHAIR_TEXTURE.get_size()
+	var target_scale := _cell_height * 1.2 / tex_size.x
+	brick_container.get_parent().add_child(marker)
+
+	# 지연 후 스케일 펀치 등장 + 회전
+	var tween := create_tween()
+	tween.tween_interval(delay)
+	tween.tween_property(marker, "scale", Vector2(target_scale, target_scale), 0.15)\
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	# 지속 회전
+	tween.tween_property(marker, "rotation_degrees", 360.0, 2.0)
+	# 0.8초 후 자동 소멸
+	var cleanup_tween := create_tween()
+	cleanup_tween.tween_interval(delay + 0.8)
+	cleanup_tween.tween_property(marker, "modulate:a", 0.0, 0.15)
+	cleanup_tween.tween_callback(marker.queue_free)
+
+
+# 지연 후 미사일을 발사한다.
+func _spawn_missile(origin: Vector2, target: StaticBody2D, delay: float) -> void:
+	var missile: Node2D = MISSILE_SCENE.instantiate()
+	missile.global_position = origin
+	missile.setup(target, target.position)
+	add_child(missile)
+
+	var tween := create_tween()
+	tween.tween_interval(delay)
+	tween.tween_callback(missile.launch)
 
 
 # 스테이지 클리어 시 모든 공을 즉시 회수 지점으로 직선 이동시킨다.
