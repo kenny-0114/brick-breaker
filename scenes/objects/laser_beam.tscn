@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/objects/laser_beam.gd" id="1_beam"]
+[ext_resource type="Texture2D" path="res://assets/images/items/laser/laser.png" id="2_laser_tex"]
+
+[node name="LaserBeam" type="Node2D"]
+z_index = 40
+script = ExtResource("1_beam")
+
+[node name="BeamSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_laser_tex")
