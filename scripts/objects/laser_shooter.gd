@@ -93,13 +93,12 @@ func _scan_direction(dir: int) -> Dictionary:
 	var max_dist: float = 800.0
 
 	var bricks_hit: Array = []
-	var scan_pos: Vector2 = global_position + step * cell_size * 0.5
-	var total_dist: float = cell_size * 0.5
+	# 슈터 위치에서 1셀 떨어진 곳부터 스캔 시작 (셀 중앙을 정확히 지남)
+	var scan_pos: Vector2 = global_position + step * cell_size
+	var total_dist: float = cell_size
 
 	# 셀 단위로 스캔
 	for i in range(20):
-		scan_pos += step * cell_size
-		total_dist += cell_size
 		# 화면 밖 체크
 		if scan_pos.x < 0 or scan_pos.x > 480 or scan_pos.y < 68 or scan_pos.y > 748:
 			break
@@ -107,9 +106,11 @@ func _scan_direction(dir: int) -> Dictionary:
 		var found_brick: Node = _find_brick_at(scan_pos, cell_size * 0.4)
 		if found_brick:
 			bricks_hit.append(found_brick)
-			# 파괴불가 벽돌이면 여기서 멈춤
 			if found_brick.hp == -1:
 				break
+		# 다음 셀로 이동
+		scan_pos += step * cell_size
+		total_dist += cell_size
 
 	return {"bricks": bricks_hit, "length": total_dist}
 
