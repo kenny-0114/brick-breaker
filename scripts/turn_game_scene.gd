@@ -8,6 +8,7 @@ const BALL_SCENE := preload("res://scenes/objects/ball.tscn")
 const BRICK_SCENE := preload("res://scenes/objects/brick.tscn")
 const BALL_ITEM_SCENE := preload("res://scenes/objects/ball_item.tscn")
 const MISSILE_SCENE := preload("res://scenes/objects/missile.tscn")
+const LASER_SHOOTER_SCENE := preload("res://scenes/objects/laser_shooter.tscn")
 const CROSSHAIR_TEXTURE := preload("res://assets/images/items/effects/crosshair_red_large.png")
 const MISSILE_COUNT := 5
 const MISSILE_FIRE_INTERVAL := 0.05
@@ -42,6 +43,7 @@ var _stuck_timer: Timer = null
 @onready var hud := $HUD
 @onready var pause_menu := $PauseMenu
 @onready var game_over_menu := $GameOverMenu
+@onready var shooter_container: Node2D = $ShooterContainer
 
 
 func _ready() -> void:
@@ -147,6 +149,22 @@ func _load_level(level: int) -> void:
 		item_container.add_child(item)
 		item.collected.connect(_on_ball_item_collected)
 
+	# 레이저 슈터 배치
+	var shooters_array: Array = data.get("laser_shooters", []) as Array
+	for shooter_data: Dictionary in shooters_array:
+		var shooter: Area2D = LASER_SHOOTER_SCENE.instantiate()
+		var row: int = int(shooter_data["row"])
+		var col: int = int(shooter_data["col"])
+		var shooter_uses: int = int(shooter_data.get("uses", 10))
+		var shooter_damage: int = int(shooter_data.get("damage", 1))
+		var shooter_dirs: Array = shooter_data.get("dirs", [0]) as Array
+		shooter.position = Vector2(
+			(col + 0.5) * cell_width,
+			GRID_TOP_OFFSET + (row + 0.5) * cell_height
+		)
+		shooter_container.add_child(shooter)
+		shooter.setup(shooter_uses, shooter_damage, shooter_dirs, cell_size, brick_container)
+
 	# Launcher 설정
 	launcher.setup(BALL_SCENE, _ball_speed, ball_container)
 	launcher.global_position = Vector2(0, FLOOR_Y)
@@ -246,7 +264,7 @@ func _end_turn() -> void:
 
 # 모든 벽돌을 한 칸 아래로 이동시킨다.
 func _descend_bricks() -> void:
-	if brick_container.get_child_count() == 0 and item_container.get_child_count() == 0:
+	if brick_container.get_child_count() == 0 and item_container.get_child_count() == 0 and shooter_container.get_child_count() == 0:
 		return
 	var tween := create_tween()
 	tween.set_parallel(true)
@@ -255,6 +273,9 @@ func _descend_bricks() -> void:
 	# 공 아이템도 함께 하강
 	for item in item_container.get_children():
 		tween.tween_property(item, "position:y", item.position.y + _cell_height, DESCEND_DURATION)
+	# 레이저 슈터도 함께 하강
+	for shooter in shooter_container.get_children():
+		tween.tween_property(shooter, "position:y", shooter.position.y + _cell_height, DESCEND_DURATION)
 	await tween.finished
 
 

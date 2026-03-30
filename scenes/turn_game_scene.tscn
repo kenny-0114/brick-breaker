@@ -148,6 +148,8 @@ position = Vector2(0, 708)
 
 [node name="ItemContainer" type="Node2D" parent="." unique_id=2001313194]
 
+[node name="ShooterContainer" type="Node2D" parent="."]
+
 [node name="BallContainer" type="Node2D" parent="." unique_id=2095272638]
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=368528292]
