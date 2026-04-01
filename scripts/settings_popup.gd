@@ -14,8 +14,11 @@ func _ready() -> void:
 	sfx_slider.value = float(settings.get("sfx_volume", 1.0))
 
 
-# 팝업을 연다.
+# 팝업을 열고, 현재 볼륨 설정으로 슬라이더를 동기화한다.
 func show_popup() -> void:
+	var settings: Dictionary = SaveManager.data.get("settings", {}) as Dictionary
+	bgm_slider.value = float(settings.get("bgm_volume", 1.0))
+	sfx_slider.value = float(settings.get("sfx_volume", 1.0))
 	visible = true
 
 

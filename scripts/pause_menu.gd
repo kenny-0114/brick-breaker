@@ -4,6 +4,7 @@ extends CanvasLayer
 
 @onready var dimmer: ColorRect = $Dimmer
 @onready var panel: Control = $Panel
+@onready var settings_popup: Control = $SettingsPopup
 
 
 func _ready() -> void:
@@ -11,8 +12,11 @@ func _ready() -> void:
 	panel.visible = false
 
 
+# 게임오버 상태이거나 설정 팝업이 열려있으면 ESC를 무시한다.
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
+		if not GameManager.is_playing or settings_popup.visible:
+			return
 		toggle_pause()
 
 
@@ -38,4 +42,4 @@ func _on_stage_select_pressed() -> void:
 
 
 func _on_settings_pressed() -> void:
-	$SettingsPopup.show_popup()
+	settings_popup.show_popup()

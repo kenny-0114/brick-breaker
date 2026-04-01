@@ -67,6 +67,10 @@ func _animate_stars(count: int) -> void:
 		var timer := get_tree().create_timer(STAR_DELAY * (i + 1))
 		await timer.timeout
 
+		# 씬 전환으로 노드가 해제된 경우 안전하게 중단한다
+		if not is_inside_tree():
+			return
+
 		var star: TextureRect = star_nodes[i]
 
 		# 스케일 펀치: 커졌다 원래로
@@ -107,7 +111,7 @@ func _spawn_star_particles(star: TextureRect) -> void:
 	var gradient := Gradient.new()
 	gradient.set_color(0, Color(1.0, 0.9, 0.3, 1.0))
 	gradient.add_point(0.6, Color(1.0, 0.85, 0.2, 1.0))
-	gradient.set_color(2, Color(1.0, 0.7, 0.1, 0.0))
+	gradient.set_color(gradient.get_point_count() - 1, Color(1.0, 0.7, 0.1, 0.0))
 	var grad_tex := GradientTexture1D.new()
 	grad_tex.gradient = gradient
 	mat.color_ramp = grad_tex
@@ -152,7 +156,13 @@ func _on_stage_select_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/stage_select.tscn")
 
 
+# 다음 레벨로 진행한다. 레벨 파일이 없으면 스테이지 선택으로 이동한다.
 func _on_next_pressed() -> void:
 	get_tree().paused = false
-	GameManager.current_level += 1
-	get_tree().reload_current_scene()
+	var next_level := GameManager.current_level + 1
+	var path := "res://data/levels/level_%d.json" % next_level
+	if FileAccess.file_exists(path):
+		GameManager.current_level = next_level
+		get_tree().reload_current_scene()
+	else:
+		get_tree().change_scene_to_file("res://scenes/stage_select.tscn")
