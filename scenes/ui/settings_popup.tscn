@@ -1,9 +1,21 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/settings_popup.gd" id="1_settings"]
 [ext_resource type="FontFile" path="res://assets/fonts/Kenney Future.ttf" id="2_font"]
 [ext_resource type="Texture2D" path="res://assets/images/ui/panel_bg.png" id="3_panel"]
 [ext_resource type="Texture2D" path="res://assets/images/ui/btn_green.png" id="4_btn_green"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/btn_blue.png" id="5_btn_blue"]
+
+[sub_resource type="StyleBoxTexture" id="header_blue"]
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 14.0
+texture = ExtResource("5_btn_blue")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 16.0
 
 [sub_resource type="StyleBoxTexture" id="panel_style"]
 texture = ExtResource("3_panel")
@@ -43,9 +55,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.5)
+color = Color(0, 0, 0, 0.4)
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -58,58 +70,74 @@ offset_right = 155.0
 offset_bottom = 140.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("panel_style")
+theme_override_constants/separation = -4
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+[node name="HeaderPanel" type="Panel" parent="Panel"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 56)
+theme_override_styles/panel = SubResource("header_blue")
+
+[node name="TitleLabel" type="Label" parent="Panel/HeaderPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 6.0
-offset_top = 4.0
-offset_right = -6.0
-offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "Settings"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BodyPanel" type="Panel" parent="Panel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("panel_style")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/BodyPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 24
-theme_override_colors/font_color = Color(0.27, 0.69, 0.9, 1)
-text = "Settings"
-horizontal_alignment = 1
-
-[node name="BGMLabel" type="Label" parent="Panel/VBoxContainer"]
+[node name="BGMLabel" type="Label" parent="Panel/BodyPanel/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.4, 0.4, 0.45, 1)
 text = "BGM Volume"
 
-[node name="BGMSlider" type="HSlider" parent="Panel/VBoxContainer"]
+[node name="BGMSlider" type="HSlider" parent="Panel/BodyPanel/VBoxContainer"]
 layout_mode = 2
 min_value = 0.0
 max_value = 1.0
 step = 0.05
 value = 1.0
 
-[node name="SFXLabel" type="Label" parent="Panel/VBoxContainer"]
+[node name="SFXLabel" type="Label" parent="Panel/BodyPanel/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.4, 0.4, 0.45, 1)
 text = "SFX Volume"
 
-[node name="SFXSlider" type="HSlider" parent="Panel/VBoxContainer"]
+[node name="SFXSlider" type="HSlider" parent="Panel/BodyPanel/VBoxContainer"]
 layout_mode = 2
 min_value = 0.0
 max_value = 1.0
 step = 0.05
 value = 1.0
 
-[node name="CloseButton" type="Button" parent="Panel/VBoxContainer"]
+[node name="CloseButton" type="Button" parent="Panel/BodyPanel/VBoxContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_override_fonts/font = ExtResource("2_font")
@@ -120,6 +148,6 @@ theme_override_styles/hover = SubResource("btn_close")
 theme_override_styles/pressed = SubResource("btn_close")
 text = "Close"
 
-[connection signal="value_changed" from="Panel/VBoxContainer/BGMSlider" to="." method="_on_bgm_slider_value_changed"]
-[connection signal="value_changed" from="Panel/VBoxContainer/SFXSlider" to="." method="_on_sfx_slider_value_changed"]
-[connection signal="pressed" from="Panel/VBoxContainer/CloseButton" to="." method="_on_close_pressed"]
+[connection signal="value_changed" from="Panel/BodyPanel/VBoxContainer/BGMSlider" to="." method="_on_bgm_slider_value_changed"]
+[connection signal="value_changed" from="Panel/BodyPanel/VBoxContainer/SFXSlider" to="." method="_on_sfx_slider_value_changed"]
+[connection signal="pressed" from="Panel/BodyPanel/VBoxContainer/CloseButton" to="." method="_on_close_pressed"]

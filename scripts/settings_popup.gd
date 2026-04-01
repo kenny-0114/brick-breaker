@@ -3,8 +3,8 @@
 extends Control
 
 @onready var panel: Control = $Panel
-@onready var bgm_slider: HSlider = $Panel/VBoxContainer/BGMSlider
-@onready var sfx_slider: HSlider = $Panel/VBoxContainer/SFXSlider
+@onready var bgm_slider: HSlider = $Panel/BodyPanel/VBoxContainer/BGMSlider
+@onready var sfx_slider: HSlider = $Panel/BodyPanel/VBoxContainer/SFXSlider
 
 
 func _ready() -> void:

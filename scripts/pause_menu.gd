@@ -24,8 +24,12 @@ func toggle_pause() -> void:
 	panel.visible = is_paused
 
 
+# Resume 클릭이 Launcher 입력으로 전파되지 않도록 해제를 지연한다.
 func _on_resume_pressed() -> void:
-	toggle_pause()
+	dimmer.visible = false
+	panel.visible = false
+	await get_tree().process_frame
+	get_tree().paused = false
 
 
 func _on_stage_select_pressed() -> void:

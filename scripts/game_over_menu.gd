@@ -81,34 +81,49 @@ func _animate_stars(count: int) -> void:
 		_spawn_star_particles(star)
 
 
-# 별 위치에서 반짝이 파티클을 발사한다.
+# 별 위치에서 작은 별 파티클을 터뜨린다.
 func _spawn_star_particles(star: TextureRect) -> void:
 	var particles := GPUParticles2D.new()
 	particles.emitting = true
 	particles.one_shot = true
-	particles.amount = 12
-	particles.lifetime = 0.6
-	# 별의 중앙 위치 계산
+	particles.amount = 16
+	particles.lifetime = 0.8
 	particles.position = star.global_position + star.size * 0.5
 
 	var mat := ParticleProcessMaterial.new()
 	mat.direction = Vector3(0, -1, 0)
 	mat.spread = 180.0
-	mat.initial_velocity_min = 60.0
-	mat.initial_velocity_max = 150.0
-	mat.gravity = Vector3(0, 200, 0)
-	mat.scale_min = 0.03
-	mat.scale_max = 0.08
-	mat.angular_velocity_min = -300.0
-	mat.angular_velocity_max = 300.0
+	mat.initial_velocity_min = 80.0
+	mat.initial_velocity_max = 200.0
+	mat.gravity = Vector3(0, 250, 0)
+	mat.scale_min = 0.15
+	mat.scale_max = 0.3
+	mat.angular_velocity_min = -400.0
+	mat.angular_velocity_max = 400.0
 	mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
-	mat.emission_sphere_radius = 15.0
-	mat.color = Color(1.0, 0.85, 0.2, 1.0)
+	mat.emission_sphere_radius = 10.0
+
+	# 금색 → 투명 페이드아웃
+	var gradient := Gradient.new()
+	gradient.set_color(0, Color(1.0, 0.9, 0.3, 1.0))
+	gradient.add_point(0.6, Color(1.0, 0.85, 0.2, 1.0))
+	gradient.set_color(2, Color(1.0, 0.7, 0.1, 0.0))
+	var grad_tex := GradientTexture1D.new()
+	grad_tex.gradient = gradient
+	mat.color_ramp = grad_tex
+
+	# 수명에 따라 크기가 줄어들며 사라진다
+	var curve := Curve.new()
+	curve.add_point(Vector2(0.0, 1.0))
+	curve.add_point(Vector2(0.5, 0.6))
+	curve.add_point(Vector2(1.0, 0.0))
+	var scale_tex := CurveTexture.new()
+	scale_tex.curve = curve
+	mat.scale_curve = scale_tex
 
 	particles.process_material = mat
 	particles.texture = STAR_FILLED
 
-	# Root에 추가 (CanvasLayer 직계)
 	add_child(particles)
 	particles.finished.connect(particles.queue_free)
 
