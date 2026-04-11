@@ -5,6 +5,8 @@
 .bkit/
 kenney-assets/
 sounds_resource/
+.claude/
+.codex
 
 # 개발 임시 파일
 .playwright-mcp/
@@ -12,3 +14,11 @@ skills-lock.json
 
 # 목업 (테스트용)
 mockup/
+
+# bkit/PDCA 생성 문서 (로컬 전용)
+docs/01-plan/
+docs/02-design/
+docs/project-status.md
+docs/puzzle-level-design-principles.md
+docs/puzzle-stage-plan-01-12.md
+docs/puzzle-transition-action-items.md

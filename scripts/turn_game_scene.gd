@@ -340,11 +340,11 @@ func _spawn_lockon_marker(target: Node2D, delay: float) -> void:
 	marker.texture = CROSSHAIR_TEXTURE
 	marker.scale = Vector2.ZERO
 	marker.z_index = 60
-	marker.position = target.position
 	# 셀 크기에 맞게 마커 크기 조절
 	var tex_size: Vector2 = CROSSHAIR_TEXTURE.get_size()
 	var target_scale: float = _cell_height * 1.2 / tex_size.x
 	brick_container.get_parent().add_child(marker)
+	marker.global_position = target.global_position
 
 	# 지연 후 스케일 펀치 등장 + 회전
 	var tween := create_tween()
@@ -364,7 +364,7 @@ func _spawn_lockon_marker(target: Node2D, delay: float) -> void:
 func _spawn_missile(origin: Vector2, target: StaticBody2D, delay: float) -> void:
 	var missile: Node2D = MISSILE_SCENE.instantiate()
 	missile.global_position = origin
-	missile.setup(target, target.position)
+	missile.setup(target, target.global_position)
 	add_child(missile)
 
 	var tween := create_tween()

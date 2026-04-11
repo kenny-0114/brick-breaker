@@ -17,6 +17,7 @@ var uses: int = 10
 var damage: int = 1
 var dirs: Array = [0]
 var _brick_container: Node2D = null
+var _cell_size: float = 48.0
 
 @onready var shooter_sprite: Sprite2D = $Sprite2D
 @onready var uses_label: Label = $UsesLabel
@@ -28,6 +29,7 @@ func setup(shooter_uses: int, shooter_damage: int, shooter_dirs: Array, cell_siz
 	damage = shooter_damage
 	dirs = shooter_dirs
 	_brick_container = brick_cont
+	_cell_size = cell_size.x
 	_update_texture(cell_size)
 	_update_uses_label()
 
@@ -93,29 +95,29 @@ func _scan_direction(dir: int) -> Dictionary:
 	# 방향 벡터 (0=위, 1=오른쪽, 2=아래, 3=왼쪽)
 	var dir_vectors := {0: Vector2(0, -1), 1: Vector2(1, 0), 2: Vector2(0, 1), 3: Vector2(-1, 0)}
 	var step: Vector2 = dir_vectors[dir]
-	var cell_size: float = 48.0
-	# 벽 경계
-	var max_dist: float = 800.0
+	# setup()에서 전달받은 셀 크기를 사용한다.
+	var cs: float = _cell_size
+	var viewport_width: float = get_viewport_rect().size.x
 
 	var bricks_hit: Array = []
 	# 슈터 위치에서 1셀 떨어진 곳부터 스캔 시작 (셀 중앙을 정확히 지남)
-	var scan_pos: Vector2 = global_position + step * cell_size
-	var total_dist: float = cell_size
+	var scan_pos: Vector2 = global_position + step * cs
+	var total_dist: float = cs
 
 	# 셀 단위로 스캔
 	for i in range(20):
 		# 화면 밖 체크
-		if scan_pos.x < 0 or scan_pos.x > 480 or scan_pos.y < 68 or scan_pos.y > 748:
+		if scan_pos.x < 0 or scan_pos.x > viewport_width or scan_pos.y < 68 or scan_pos.y > 748:
 			break
 		# 해당 위치에 벽돌이 있는지 확인
-		var found_brick: Node = _find_brick_at(scan_pos, cell_size * 0.4)
+		var found_brick: Node = _find_brick_at(scan_pos, cs * 0.4)
 		if found_brick:
 			bricks_hit.append(found_brick)
 			if found_brick.hp == -1:
 				break
 		# 다음 셀로 이동
-		scan_pos += step * cell_size
-		total_dist += cell_size
+		scan_pos += step * cs
+		total_dist += cs
 
 	return {"bricks": bricks_hit, "length": total_dist}
 

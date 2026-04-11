@@ -62,7 +62,7 @@ var item: String = ""
 
 
 # 사각형 벽돌 초기화.
-func setup(brick_hp: int, cell_size: Vector2 = Vector2(48, 48)) -> void:
+func setup(brick_hp: int, cell_size: Vector2) -> void:
 	hp = brick_hp
 	_is_triangle = false
 	if hp == -1:

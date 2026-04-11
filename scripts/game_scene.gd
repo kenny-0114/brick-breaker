@@ -64,7 +64,7 @@ func _load_level(level: int) -> void:
 		return
 	var data: Dictionary = json.data
 
-	GameManager.start_level(level)
+	GameManager.start_level(level, 1, [20, 15, 10])
 	_ball_speed = float(data.get("ball_speed", 300.0))
 	_remaining_bricks = 0
 
@@ -83,7 +83,7 @@ func _load_level(level: int) -> void:
 			GRID_TOP_OFFSET + row * (brick_width * 0.5 + BRICK_MARGIN)
 		)
 		brick_container.add_child(brick)
-		brick.setup(hp)
+		brick.setup(hp, Vector2(brick_width, brick_width))
 
 		if hp != -1:
 			_remaining_bricks += 1
@@ -101,10 +101,10 @@ func _launch_all_balls() -> void:
 		ball.launch()
 
 
-func _on_brick_destroyed(pos: Vector2, hp: int) -> void:
-	GameManager.add_brick_score(hp)
+func _on_brick_destroyed(pos: Vector2, _item: String = "") -> void:
+	GameManager.add_brick_score()
 	_remaining_bricks -= 1
-	_spawn_particles(pos, hp)
+	_spawn_particles(pos)
 	if randf() < POWERUP_DROP_CHANCE:
 		_spawn_powerup(pos)
 	if _remaining_bricks <= 0:
@@ -112,8 +112,10 @@ func _on_brick_destroyed(pos: Vector2, hp: int) -> void:
 
 
 # 벽돌 조각이 흩어지는 파티클. 정사각형 벽돌 이미지를 텍스처로 사용한다.
-func _spawn_particles(pos: Vector2, hp: int) -> void:
-	var tex: Texture2D = DEBRIS_TEXTURES.get(hp, DEBRIS_TEXTURES[1]) as Texture2D
+func _spawn_particles(pos: Vector2) -> void:
+	# hp 정보 없이 호출되므로 랜덤 파편 색상을 사용한다.
+	var keys: Array = DEBRIS_TEXTURES.keys()
+	var tex: Texture2D = DEBRIS_TEXTURES[keys.pick_random()] as Texture2D
 	var mat := ParticleProcessMaterial.new()
 	mat.direction = Vector3(0, 1, 0)
 	mat.spread = 120.0

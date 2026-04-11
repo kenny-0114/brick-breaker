@@ -73,7 +73,22 @@ func save_settings(bgm_volume: float, sfx_volume: float) -> void:
 
 
 # 파싱된 데이터를 기본값 위에 안전하게 병합한다.
+# 타입이 불일치하면 기본값을 유지하고, Dictionary는 키별로 부분 병합한다.
 func _merge_data(parsed: Dictionary) -> void:
 	for key in data.keys():
-		if parsed.has(key):
-			data[key] = parsed[key]
+		if not parsed.has(key):
+			continue
+		var default_val: Variant = data[key]
+		var parsed_val: Variant = parsed[key]
+		# 타입이 다르면 기본값을 유지한다. (JSON은 숫자를 float으로 파싱하므로 int↔float 허용)
+		if typeof(default_val) != typeof(parsed_val):
+			var is_numeric := typeof(default_val) in [TYPE_INT, TYPE_FLOAT] and typeof(parsed_val) in [TYPE_INT, TYPE_FLOAT]
+			if not is_numeric:
+				push_warning("SaveManager: '%s' 타입 불일치, 기본값 유지" % key)
+				continue
+		# 양쪽 다 Dictionary면 키별로 부분 병합한다.
+		if default_val is Dictionary and parsed_val is Dictionary:
+			for sub_key in (parsed_val as Dictionary).keys():
+				(default_val as Dictionary)[sub_key] = parsed_val[sub_key]
+		else:
+			data[key] = parsed_val

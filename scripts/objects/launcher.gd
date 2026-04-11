@@ -70,10 +70,14 @@ func disable_aiming() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	# 터치/마우스 시작
+	# 터치/마우스 시작 — 클릭 가능한 UI 위젯 위의 입력은 무시한다.
 	if event is InputEventScreenTouch and event.pressed:
+		if _is_over_interactive_control():
+			return
 		_start_aiming(event.position)
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if _is_over_interactive_control():
+			return
 		_start_aiming(event.position)
 	# 터치/마우스 드래그
 	elif event is InputEventScreenDrag:
@@ -85,6 +89,15 @@ func _input(event: InputEvent) -> void:
 		_release_aim()
 	elif event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		_release_aim()
+
+
+# 포인터 아래에 클릭 가능한 UI 위젯(Button, Slider 등)이 있는지 확인한다.
+# 장식용 Panel이나 Label은 무시하여 발사 입력을 차단하지 않는다.
+func _is_over_interactive_control() -> bool:
+	var control := get_viewport().gui_get_hovered_control()
+	if control == null:
+		return false
+	return control is BaseButton or control is Slider or control is LineEdit or control is TextEdit
 
 
 # 조준을 시작한다.
