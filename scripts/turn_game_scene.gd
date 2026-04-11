@@ -44,6 +44,7 @@ var _stuck_timer: Timer = null
 @onready var pause_menu := $PauseMenu
 @onready var game_over_menu := $GameOverMenu
 @onready var shooter_container: Node2D = $ShooterContainer
+@onready var speed_indicator := $SpeedIndicator
 
 
 func _ready() -> void:
@@ -70,10 +71,14 @@ func _process(delta: float) -> void:
 	var real_delta := delta / Engine.time_scale if Engine.time_scale > 0 else delta
 	_waiting_elapsed += real_delta
 	# 경과 시간에 따라 배속 단계를 올린다.
+	var prev_scale := Engine.time_scale
 	if _waiting_elapsed >= SPEED_RAMP_DELAY_2 and Engine.time_scale < SPEED_STAGE_2:
 		Engine.time_scale = SPEED_STAGE_2
 	elif _waiting_elapsed >= SPEED_RAMP_DELAY_1 and Engine.time_scale < SPEED_STAGE_1:
 		Engine.time_scale = SPEED_STAGE_1
+	# 배속이 변경되었으면 인디케이터를 갱신한다.
+	if Engine.time_scale != prev_scale:
+		speed_indicator.show_speed(Engine.time_scale)
 
 
 # JSON에서 레벨 데이터를 읽어 벽돌과 공 아이템을 배치한다.
@@ -238,6 +243,7 @@ func _check_all_balls_returned() -> void:
 func _end_turn() -> void:
 	_state = State.TURN_END
 	Engine.time_scale = 1.0
+	speed_indicator.show_speed(1.0)
 	_stuck_timer.stop()
 	GameManager.advance_turn()
 
@@ -542,11 +548,13 @@ func _force_collect_balls() -> void:
 
 func _on_game_over() -> void:
 	Engine.time_scale = 1.0
+	speed_indicator.show_speed(1.0)
 	await get_tree().create_timer(0.5).timeout
 	game_over_menu.show_game_over()
 
 
 func _on_stage_cleared() -> void:
 	Engine.time_scale = 1.0
+	speed_indicator.show_speed(1.0)
 	await get_tree().create_timer(0.5).timeout
 	game_over_menu.show_clear()

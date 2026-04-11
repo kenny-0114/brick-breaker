@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://x0rk5s8rxsp7" path="res://assets/images/ui/panel_bg.png" id="13_panel"]
 [ext_resource type="Texture2D" path="res://assets/images/ui/star.png" id="14_star"]
 [ext_resource type="Texture2D" path="res://assets/images/ui/icon_pause.png" id="15_icon_pause"]
+[ext_resource type="PackedScene" path="res://scenes/ui/speed_indicator.tscn" id="17_speed_indicator"]
 
 [sub_resource type="RectangleShape2D" id="wall_h"]
 size = Vector2(480, 20)
@@ -356,6 +357,8 @@ theme_override_styles/focus = SubResource("btn_focus")
 text = "Stage Select"
 
 [node name="SettingsPopup" parent="PauseMenu" unique_id=190827502 instance=ExtResource("6_settings")]
+
+[node name="SpeedIndicator" parent="." instance=ExtResource("17_speed_indicator")]
 
 [node name="GameOverMenu" parent="." instance=ExtResource("4_gameover_scene")]
 
