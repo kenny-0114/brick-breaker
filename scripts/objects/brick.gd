@@ -48,6 +48,7 @@ const TRI_CENTROID := {
 const TILE_SIZE := 70.0
 const ITEM_BOX_TEXTURE := preload("res://assets/images/items/item_box_frame.png")
 const MISSILE_ICON_TEXTURE := preload("res://assets/images/items/missile/spaceMissiles_007.png")
+const OUTLINE_SHRINK := 0.95
 
 var hp: int = 1
 var _is_destroyed := false
@@ -65,6 +66,8 @@ var item: String = ""
 func setup(brick_hp: int, cell_size: Vector2) -> void:
 	hp = brick_hp
 	_is_triangle = false
+	_add_outline(cell_size)
+	sprite.scale *= OUTLINE_SHRINK
 	if hp == -1:
 		_update_texture("grey")
 		hp_label.visible = false
@@ -93,10 +96,10 @@ func setup_triangle(brick_hp: int, dir: int, cell_size: Vector2) -> void:
 	for v: Vector2 in base_verts:
 		verts.append(Vector2(v.x * hw, v.y * hh))
 
-	# 테두리 Polygon2D (줄눈 색상, 풀사이즈)
+	# 테두리 Polygon2D (검은 아웃라인, 풀사이즈)
 	_border_polygon = Polygon2D.new()
 	_border_polygon.polygon = verts
-	_border_polygon.color = MORTAR_COLORS["green"]
+	_border_polygon.color = Color.BLACK
 	add_child(_border_polygon)
 
 	# 메인 Polygon2D (텍스처 매핑, 약간 안쪽으로 축소)
@@ -108,7 +111,7 @@ func setup_triangle(brick_hp: int, dir: int, cell_size: Vector2) -> void:
 	var inner_verts: PackedVector2Array = PackedVector2Array()
 	var uvs: PackedVector2Array = PackedVector2Array()
 	for v in verts:
-		var shrunk := centroid + (v - centroid) * 0.92
+		var shrunk := centroid + (v - centroid) * OUTLINE_SHRINK
 		inner_verts.append(shrunk)
 		# 꼭짓점 위치를 텍스처 좌표로 변환한다.
 		uvs.append(Vector2(
@@ -196,18 +199,33 @@ func _update_texture(color_key: String) -> void:
 		sprite.texture = TEXTURES[color_key]
 
 
-# 삼각형 벽돌 텍스처와 줄눈 색상을 교체한다.
+# 삼각형 벽돌 텍스처를 교체한다. 아웃라인은 항상 검은색을 유지한다.
 func _update_triangle_color(color_key: String) -> void:
 	if _polygon and TEXTURES.has(color_key):
 		_polygon.texture = TEXTURES[color_key]
-	if _border_polygon and MORTAR_COLORS.has(color_key):
-		_border_polygon.color = MORTAR_COLORS[color_key]
 
 
-# HP 라벨을 갱신한다.
+# HP 라벨을 갱신한다. 블럭 타입과 자릿수에 따라 폰트 크기를 동적 조정한다.
 func _update_hp_label() -> void:
 	if hp_label:
 		hp_label.text = str(hp)
+		var is_three_digit := hp >= 100
+		if _is_triangle:
+			hp_label.add_theme_font_size_override("font_size", 11 if is_three_digit else 13)
+			hp_label.add_theme_constant_override("outline_size", 3 if is_three_digit else 4)
+		else:
+			hp_label.add_theme_font_size_override("font_size", 13 if is_three_digit else 16)
+			hp_label.add_theme_constant_override("outline_size", 4 if is_three_digit else 5)
+
+
+# 사각형 벽돌 뒤에 검은 아웃라인 배경을 추가한다.
+func _add_outline(cell_size: Vector2) -> void:
+	var outline := ColorRect.new()
+	outline.color = Color.BLACK
+	outline.size = cell_size
+	outline.position = -cell_size / 2.0
+	add_child(outline)
+	move_child(outline, 0)
 
 
 # 피격 시 플래시 + 스케일 펀치 효과를 재생한다.
@@ -238,7 +256,7 @@ func _setup_item_box(cell_size: Vector2) -> void:
 	# 일반 벽돌 스프라이트를 아이템 상자 프레임으로 교체한다.
 	sprite.texture = ITEM_BOX_TEXTURE
 	var tex_size: Vector2 = ITEM_BOX_TEXTURE.get_size()
-	sprite.scale = Vector2(cell_size.x / tex_size.x, cell_size.y / tex_size.y)
+	sprite.scale = Vector2(cell_size.x / tex_size.x, cell_size.y / tex_size.y) * OUTLINE_SHRINK
 
 	# 미사일 아이콘을 45도 기울여서 중앙에 배치한다.
 	var icon := Sprite2D.new()

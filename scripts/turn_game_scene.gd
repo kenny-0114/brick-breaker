@@ -45,6 +45,9 @@ var _stuck_timer: Timer = null
 @onready var game_over_menu := $GameOverMenu
 @onready var shooter_container: Node2D = $ShooterContainer
 @onready var speed_indicator := $SpeedIndicator
+@onready var recall_button: Button = $HUD/BottomPanel/BottomHBox/RecallButton
+
+var _recall_tween: Tween = null
 
 
 func _ready() -> void:
@@ -53,6 +56,9 @@ func _ready() -> void:
 	floor_zone.body_entered.connect(_on_floor_body_entered)
 	launcher.all_balls_fired.connect(_on_all_balls_fired)
 	launcher.aiming_ended.connect(_on_aiming_ended)
+	recall_button.pressed.connect(_on_recall_pressed)
+	recall_button.visible = false
+	recall_button.modulate.a = 0.0
 	# 안전 타이머: 공이 끼였을 때 강제 회수
 	_stuck_timer = Timer.new()
 	_stuck_timer.wait_time = 15.0
@@ -193,6 +199,7 @@ func _start_aiming() -> void:
 func _on_aiming_ended() -> void:
 	_state = State.FIRING
 	_hide_launch_indicator()
+	_show_recall_button()
 
 
 # Launcher가 모든 공을 발사 완료했을 때 호출된다.
@@ -244,6 +251,7 @@ func _end_turn() -> void:
 	_state = State.TURN_END
 	Engine.time_scale = 1.0
 	speed_indicator.show_speed(1.0)
+	_hide_recall_button()
 	_stuck_timer.stop()
 	GameManager.advance_turn()
 
@@ -401,6 +409,37 @@ func _recall_all_balls() -> void:
 	await get_tree().process_frame
 	if _state == State.WAITING or _state == State.FIRING:
 		_end_turn()
+
+
+# 회수 버튼을 눌렀을 때 호출된다. FIRING/WAITING 모두 허용한다.
+func _on_recall_pressed() -> void:
+	if _state == State.FIRING or _state == State.WAITING:
+		_hide_recall_button()
+		_recall_all_balls()
+
+
+# 회수 버튼을 페이드인한다.
+func _show_recall_button() -> void:
+	if recall_button.visible and recall_button.modulate.a >= 1.0:
+		return
+	recall_button.visible = true
+	recall_button.modulate.a = 0.0
+	if _recall_tween and _recall_tween.is_valid():
+		_recall_tween.kill()
+	_recall_tween = create_tween()
+	_recall_tween.tween_property(recall_button, "modulate:a", 1.0, 0.3)
+
+
+# 회수 버튼을 페이드아웃한다.
+func _hide_recall_button() -> void:
+	if not recall_button.visible:
+		return
+	recall_button.scale = Vector2.ONE
+	if _recall_tween and _recall_tween.is_valid():
+		_recall_tween.kill()
+	_recall_tween = create_tween()
+	_recall_tween.tween_property(recall_button, "modulate:a", 0.0, 0.3)
+	_recall_tween.tween_callback(func(): recall_button.visible = false)
 
 
 # 공 아이템 수집 시 호출된다.
