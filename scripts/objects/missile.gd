@@ -53,7 +53,8 @@ func _on_arrived() -> void:
 	if is_instance_valid(_target_brick) and not _target_brick.is_queued_for_deletion():
 		_target_brick.destroy_by_missile()
 
-	# 폭발 이펙트 재생
+	# 폭발 사운드 및 이펙트 재생
+	SoundManager.play_sfx(SoundManager.sfx_explosion)
 	_play_explosion()
 
 

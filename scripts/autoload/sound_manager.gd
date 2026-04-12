@@ -15,6 +15,8 @@ var _sfx_bus_idx: int = -1
 var sfx_click: AudioStream = preload("res://assets/sounds/click-a.ogg")
 var sfx_tap: AudioStream = preload("res://assets/sounds/tap-a.ogg")
 var sfx_ball_hit: AudioStream = preload("res://assets/sounds/sfx_ball_hit.ogg")
+var sfx_laser: AudioStream = preload("res://assets/sounds/sfx_laser.ogg")
+var sfx_explosion: AudioStream = preload("res://assets/sounds/sfx_explosion.ogg")
 
 
 func _ready() -> void:

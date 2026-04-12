@@ -72,6 +72,7 @@ func _on_body_entered(body: Node) -> void:
 	uses -= 1
 	_update_uses_label()
 	_fire_lasers()
+	SoundManager.play_sfx(SoundManager.sfx_laser)
 	shooter_fired.emit(self)
 	if uses <= 0:
 		_die()
