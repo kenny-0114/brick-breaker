@@ -4,15 +4,18 @@ extends Control
 
 const TOTAL_LEVELS := 5
 
-var star_tex := preload("res://assets/images/ui/star.png")
-var star_outline_tex := preload("res://assets/images/ui/star_grey.png")
+var star_tex := preload("res://assets/images/ui/star_yellow.png")
+var star_outline_tex := preload("res://assets/images/ui/star_grey_new.png")
 var _font := preload("res://assets/fonts/Kenney Future.ttf")
 
 @onready var stage_grid: GridContainer = $VBoxContainer/StageGrid
+@onready var preview_popup: CanvasLayer = $StagePreviewPopup
 
 
 func _ready() -> void:
 	_build_stage_buttons()
+	preview_popup.start_pressed.connect(_on_preview_start)
+	preview_popup.visible = false
 
 
 # 스테이지 버튼을 동적으로 생성한다.
@@ -52,7 +55,7 @@ func _create_stage_button(level: int, is_unlocked: bool, stars_data: Dictionary)
 
 	# 버튼 — 정사각형 고정 크기, 내부 컨텐츠를 직접 배치
 	var btn := Button.new()
-	btn.custom_minimum_size = Vector2(88, 88)
+	btn.custom_minimum_size = Vector2(78, 78)
 	# 버튼 텍스트 비우고 내부에 레이아웃 배치
 	btn.text = ""
 	if is_unlocked:
@@ -68,10 +71,10 @@ func _create_stage_button(level: int, is_unlocked: bool, stars_data: Dictionary)
 	# 버튼 내부 레이아웃 (숫자 + 별) — 버튼 영역 안에 패딩 적용
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 6)
-	margin.add_theme_constant_override("margin_right", 6)
-	margin.add_theme_constant_override("margin_top", 6)
-	margin.add_theme_constant_override("margin_bottom", 6)
+	margin.add_theme_constant_override("margin_left", 4)
+	margin.add_theme_constant_override("margin_right", 4)
+	margin.add_theme_constant_override("margin_top", 4)
+	margin.add_theme_constant_override("margin_bottom", 4)
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var inner := VBoxContainer.new()
@@ -82,10 +85,10 @@ func _create_stage_button(level: int, is_unlocked: bool, stars_data: Dictionary)
 	# 숫자 라벨
 	var num_label := Label.new()
 	num_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	num_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	num_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	num_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	num_label.add_theme_font_override("font", _font)
-	num_label.add_theme_font_size_override("font_size", 24)
+	num_label.add_theme_font_size_override("font_size", 20)
 	num_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if is_unlocked:
 		num_label.text = str(level)
@@ -108,8 +111,8 @@ func _create_stage_button(level: int, is_unlocked: bool, stars_data: Dictionary)
 		tex_rect.texture = star_tex if j < earned_stars else star_outline_tex
 		tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		tex_rect.custom_minimum_size = Vector2(14, 14)
-		tex_rect.size = Vector2(14, 14)
+		tex_rect.custom_minimum_size = Vector2(16, 16)
+		tex_rect.size = Vector2(16, 16)
 		tex_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		stars_hbox.add_child(tex_rect)
 	inner.add_child(stars_hbox)
@@ -119,8 +122,14 @@ func _create_stage_button(level: int, is_unlocked: bool, stars_data: Dictionary)
 	return btn
 
 
+# 스테이지 버튼 클릭 시 미리보기 팝업을 표시한다.
 func _on_stage_selected(level: int) -> void:
 	SoundManager.play_sfx(SoundManager.sfx_click)
+	preview_popup.show_preview(level)
+
+
+# 미리보기에서 시작 버튼을 누르면 게임에 진입한다.
+func _on_preview_start(level: int) -> void:
 	GameManager.current_level = level
 	get_tree().change_scene_to_file("res://scenes/turn_game_scene.tscn")
 

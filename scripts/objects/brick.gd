@@ -63,7 +63,7 @@ var item: String = ""
 
 
 # 사각형 벽돌 초기화.
-func setup(brick_hp: int, cell_size: Vector2) -> void:
+func setup(brick_hp: int, cell_size: Vector2, show_hp: bool = true) -> void:
 	hp = brick_hp
 	_is_triangle = false
 	_add_outline(cell_size)
@@ -73,7 +73,10 @@ func setup(brick_hp: int, cell_size: Vector2) -> void:
 		hp_label.visible = false
 	else:
 		_update_color_by_hp()
-		_update_hp_label()
+		if show_hp:
+			_update_hp_label()
+		else:
+			hp_label.visible = false
 	# 아이템이 있으면 아이템 상자 외형으로 교체한다.
 	if item != "":
 		_setup_item_box(cell_size)
@@ -81,7 +84,7 @@ func setup(brick_hp: int, cell_size: Vector2) -> void:
 
 # 직각삼각형 벽돌 초기화. cell_size로 크기를 맞추고 dir로 방향을 정한다.
 # 타일 텍스처를 삼각형 형태로 UV 매핑하여 벽돌무늬를 표현한다.
-func setup_triangle(brick_hp: int, dir: int, cell_size: Vector2) -> void:
+func setup_triangle(brick_hp: int, dir: int, cell_size: Vector2, show_hp: bool = true) -> void:
 	hp = brick_hp
 	_is_triangle = true
 	# 사각형 스프라이트와 충돌체를 제거한다.
@@ -147,7 +150,10 @@ func setup_triangle(brick_hp: int, dir: int, cell_size: Vector2) -> void:
 		hp_label.visible = false
 	else:
 		_update_color_by_hp()
-		_update_hp_label()
+		if show_hp:
+			_update_hp_label()
+		else:
+			hp_label.visible = false
 
 
 # 공에 맞았을 때 호출된다. 이중 파괴 방지를 위해 플래그로 보호한다.
