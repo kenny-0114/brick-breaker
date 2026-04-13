@@ -14,9 +14,10 @@ const MISSILE_COUNT := 5
 const MISSILE_FIRE_INTERVAL := 0.05
 const GRID_COLS := 10
 const BRICK_MARGIN := 0.0
-const GRID_TOP_OFFSET := 84.0
+const GRID_TOP_OFFSET := 78.0
 const DESCEND_DURATION := 0.3
 const FLOOR_Y := 708.0
+const INITIAL_BOTTOM_ROW := 6  # 최하단 벽돌이 화면 상단에서 7번째 행에 배치됨 (안전선 확보)
 const SPEED_RAMP_DELAY_1 := 5.0
 const SPEED_RAMP_DELAY_2 := 10.0
 const SPEED_STAGE_1 := 2.0
@@ -30,6 +31,7 @@ var _balls_collected := 0
 var _first_ball_x := 240.0
 var _first_ball_landed := false
 var _cell_height := 34.0
+var _row_offset := 0  # 레벨 데이터 row → 화면 row 변환 오프셋
 var _balls_returned := 0
 var _landing_indicator: Node2D = null
 var _launch_indicator: Node2D = null
@@ -114,9 +116,23 @@ func _load_level(level: int) -> void:
 	var cell_height := cell_width
 	_cell_height = cell_height
 
-	# 벽돌 배치
+	# 배치 데이터 파싱
 	var cell_size := Vector2(cell_width, cell_height)
 	var bricks_array: Array = data.get("bricks", []) as Array
+	var items_array: Array = data.get("ball_items", []) as Array
+	var shooters_array: Array = data.get("laser_shooters", []) as Array
+
+	# 최하단 row 기준으로 오프셋을 계산한다 (최하단 벽돌이 화면 중간에 배치)
+	var max_row := 0
+	for brick_d: Dictionary in bricks_array:
+		max_row = maxi(max_row, int(brick_d["row"]))
+	for item_d: Dictionary in items_array:
+		max_row = maxi(max_row, int(item_d["row"]))
+	for shooter_d: Dictionary in shooters_array:
+		max_row = maxi(max_row, int(shooter_d["row"]))
+	_row_offset = maxi(0, max_row - INITIAL_BOTTOM_ROW)
+
+	# 벽돌 배치
 	for brick_data: Dictionary in bricks_array:
 		var brick: StaticBody2D = BRICK_SCENE.instantiate()
 		var row: int = int(brick_data["row"])
@@ -125,7 +141,7 @@ func _load_level(level: int) -> void:
 		var brick_type: String = str(brick_data.get("type", "rect"))
 		brick.position = Vector2(
 			(col + 0.5) * cell_width,
-			GRID_TOP_OFFSET + (row + 0.5) * cell_height
+			GRID_TOP_OFFSET + (row - _row_offset + 0.5) * cell_height
 		)
 		# 아이템 속성 파싱
 		var item_type: String = str(brick_data.get("item", ""))
@@ -148,20 +164,18 @@ func _load_level(level: int) -> void:
 			brick.brick_destroyed.connect(_on_brick_destroyed)
 
 	# 공 아이템 배치
-	var items_array: Array = data.get("ball_items", []) as Array
 	for item_data: Dictionary in items_array:
 		var item: Area2D = BALL_ITEM_SCENE.instantiate()
 		var row: int = int(item_data["row"])
 		var col: int = int(item_data["col"])
 		item.position = Vector2(
 			(col + 0.5) * cell_width,
-			GRID_TOP_OFFSET + (row + 0.5) * cell_height
+			GRID_TOP_OFFSET + (row - _row_offset + 0.5) * cell_height
 		)
 		item_container.add_child(item)
 		item.collected.connect(_on_ball_item_collected)
 
 	# 레이저 슈터 배치
-	var shooters_array: Array = data.get("laser_shooters", []) as Array
 	for shooter_data: Dictionary in shooters_array:
 		var shooter: Area2D = LASER_SHOOTER_SCENE.instantiate()
 		var row: int = int(shooter_data["row"])
@@ -171,7 +185,7 @@ func _load_level(level: int) -> void:
 		var shooter_dirs: Array = shooter_data.get("dirs", [0]) as Array
 		shooter.position = Vector2(
 			(col + 0.5) * cell_width,
-			GRID_TOP_OFFSET + (row + 0.5) * cell_height
+			GRID_TOP_OFFSET + (row - _row_offset + 0.5) * cell_height
 		)
 		shooter_container.add_child(shooter)
 		shooter.setup(shooter_uses, shooter_damage, shooter_dirs, cell_size, brick_container)

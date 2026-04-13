@@ -194,7 +194,9 @@
 const API_LEVELS = '../data/levels/';
 
 // ===== State =====
-const ROWS = 13, COLS = 10;
+const ROWS = 25, COLS = 10;
+const GAME_VISIBLE_ROWS = 13;  // 게임 화면에서 보이는 행 수
+const INITIAL_BOTTOM_ROW = 6;  // 최하단 벽돌의 게임 시작 시 행 위치
 const HP_COLORS = { green: '#8bc34a', orange: '#f5a623', red: '#e74c3c', grey: '#8a8a95' };
 const MORTAR = { green: '#5a8525', orange: '#b87808', red: '#982520', grey: '#505058' };
 const TRI_LABELS = { 0: '◣', 1: '◢', 2: '◤', 3: '◥' };
@@ -220,6 +222,17 @@ function initGrid() {
   grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 }
 initGrid();
+
+// 그리드에서 벽돌이 배치된 최하단 row를 반환한다 (-1이면 비어있음)
+function getMaxRow() {
+  let maxRow = -1;
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (grid[r][c]) maxRow = r;
+    }
+  }
+  return maxRow;
+}
 
 // ===== Canvas =====
 const canvas = document.getElementById('gridCanvas');
@@ -318,6 +331,51 @@ function render() {
         ctx.lineWidth = 3;
         ctx.strokeRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
       }
+    }
+  }
+
+  // 게임 시작 시 보이는 영역 경계 표시
+  const maxRow = getMaxRow();
+  if (maxRow >= 0) {
+    const rowOffset = Math.max(0, maxRow - INITIAL_BOTTOM_ROW);
+    if (rowOffset > 0) {
+      const boundaryY = rowOffset * cellSize;
+      // 화면 밖 영역 어둡게 처리
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+      ctx.fillRect(0, 0, canvas.width, boundaryY);
+      // 경계선 (점선)
+      ctx.strokeStyle = '#f5a623';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 4]);
+      ctx.beginPath();
+      ctx.moveTo(0, boundaryY);
+      ctx.lineTo(canvas.width, boundaryY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // 라벨
+      ctx.fillStyle = '#f5a623';
+      ctx.font = `bold ${Math.max(10, cellSize * 0.28)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('▼ 게임 시작 시 화면 상단 ▼', canvas.width / 2, boundaryY - 3);
+    }
+    // 게임오버 라인 (바닥) 표시
+    const floorRow = Math.max(0, maxRow - INITIAL_BOTTOM_ROW) + GAME_VISIBLE_ROWS - 1;
+    if (floorRow <= ROWS) {
+      const floorY = floorRow * cellSize;
+      ctx.strokeStyle = '#e74c3c';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 4]);
+      ctx.beginPath();
+      ctx.moveTo(0, floorY);
+      ctx.lineTo(canvas.width, floorY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#e74c3c';
+      ctx.font = `bold ${Math.max(10, cellSize * 0.28)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('▲ 게임오버 라인 ▲', canvas.width / 2, floorY + 3);
     }
   }
 }

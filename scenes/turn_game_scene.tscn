@@ -103,9 +103,9 @@ offset_bottom = 854.0
 color = Color(0.1, 0.1, 0.24, 1)
 
 [node name="CeilingWall" type="ColorRect" parent="." unique_id=648702574]
-offset_top = 78.0
+offset_top = 76.0
 offset_right = 480.0
-offset_bottom = 82.0
+offset_bottom = 78.0
 color = Color(0.3, 0.4, 0.6, 0.8)
 
 [node name="FloorWall" type="ColorRect" parent="." unique_id=1392003956]
@@ -116,20 +116,20 @@ color = Color(0.3, 0.4, 0.6, 0.8)
 
 [node name="LeftWall" type="ColorRect" parent="." unique_id=1572566280]
 offset_left = -2.0
-offset_top = 78.0
+offset_top = 76.0
 offset_right = 1.0
 offset_bottom = 712.0
 color = Color(0.3, 0.4, 0.6, 0.6)
 
 [node name="RightWall" type="ColorRect" parent="." unique_id=14077923]
 offset_left = 479.0
-offset_top = 78.0
+offset_top = 76.0
 offset_right = 482.0
 offset_bottom = 712.0
 color = Color(0.3, 0.4, 0.6, 0.6)
 
 [node name="WallTop" type="StaticBody2D" parent="." unique_id=657448088]
-position = Vector2(240, 68)
+position = Vector2(240, 66)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="WallTop" unique_id=1749587243]
 shape = SubResource("wall_h")
