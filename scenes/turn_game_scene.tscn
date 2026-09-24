@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://byx8w5kkec0il"]
 
 [ext_resource type="Script" uid="uid://dhbwcurvkgl3p" path="res://scripts/turn_game_scene.gd" id="1_game"]
+[ext_resource type="PackedScene" path="res://scenes/ui/tutorial_popup.tscn" id="19_tutorial"]
+[ext_resource type="PackedScene" path="res://scenes/ui/first_shot_tutorial.tscn" id="20_first_shot"]
 [ext_resource type="Script" uid="uid://cyty4cckvo3u3" path="res://scripts/hud.gd" id="2_hud"]
 [ext_resource type="Script" uid="uid://dhbvhxa3kup84" path="res://scripts/pause_menu.gd" id="3_pause"]
 [ext_resource type="PackedScene" path="res://scenes/ui/game_result_popup.tscn" id="4_gameover_scene"]
@@ -401,6 +403,10 @@ texture = ExtResource("18_recall_icon")
 expand_mode = 1
 stretch_mode = 5
 mouse_filter = 2
+
+[node name="TutorialPopup" parent="." instance=ExtResource("19_tutorial")]
+
+[node name="FirstShotTutorial" parent="." instance=ExtResource("20_first_shot")]
 
 [node name="GameOverMenu" parent="." instance=ExtResource("4_gameover_scene")]
 

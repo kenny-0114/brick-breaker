@@ -1,0 +1,39 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/first_shot_tutorial.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/Kenney Future.ttf" id="2_font"]
+[ext_resource type="Texture2D" path="res://assets/images/ui/touch_pointer.png" id="3_pointer"]
+
+[node name="FirstShotTutorial" type="CanvasLayer"]
+layer = 5
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.35)
+
+[node name="HintLabel" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -140.0
+offset_top = 280.0
+offset_right = 140.0
+offset_bottom = 320.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.6)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "Drag to Aim"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Pointer" type="Sprite2D" parent="."]
+position = Vector2(240, 700)
+texture = ExtResource("3_pointer")

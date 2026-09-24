@@ -62,6 +62,12 @@ func enable_aiming() -> void:
 	set_process_input(true)
 
 
+# 안내 오버레이에서 시작한 입력을 이어받아 바로 조준한다.
+func begin_aiming_from(touch_position: Vector2) -> void:
+	enable_aiming()
+	_start_aiming(touch_position)
+
+
 # 조준 입력을 비활성화한다.
 func disable_aiming() -> void:
 	_is_aiming = false

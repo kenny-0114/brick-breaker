@@ -12,8 +12,10 @@ var data := {
 	"stars": {},
 	"settings": {
 		"bgm_volume": 1.0,
-		"sfx_volume": 1.0
-	}
+		"sfx_volume": 1.0,
+		"repeat_tutorials": false
+	},
+	"seen_tutorials": {}
 }
 
 
@@ -69,6 +71,27 @@ func complete_stage(level: int, turn_count: int, stars_earned: int) -> void:
 func save_settings(bgm_volume: float, sfx_volume: float) -> void:
 	data["settings"]["bgm_volume"] = bgm_volume
 	data["settings"]["sfx_volume"] = sfx_volume
+	save_data()
+
+
+# 해당 튜토리얼을 이미 봤는지 확인한다.
+func has_seen_tutorial(tutorial_key: String) -> bool:
+	return data["seen_tutorials"].has(tutorial_key)
+
+
+# 반복 설정이 켜져 있거나 아직 보지 않은 안내만 표시한다.
+func should_show_tutorial(tutorial_key: String) -> bool:
+	return data["settings"].get("repeat_tutorials", false) == true or not has_seen_tutorial(tutorial_key)
+
+
+func save_repeat_tutorials(enabled: bool) -> void:
+	data["settings"]["repeat_tutorials"] = enabled
+	save_data()
+
+
+# 튜토리얼을 본 것으로 표시하고 저장한다.
+func mark_tutorial_seen(tutorial_key: String) -> void:
+	data["seen_tutorials"][tutorial_key] = true
 	save_data()
 
 

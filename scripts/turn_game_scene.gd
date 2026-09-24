@@ -48,6 +48,8 @@ var _stuck_timer: Timer = null
 @onready var shooter_container: Node2D = $ShooterContainer
 @onready var speed_indicator := $SpeedIndicator
 @onready var recall_button: Button = $HUD/BottomPanel/BottomHBox/RecallButton
+@onready var tutorial_popup: CanvasLayer = $TutorialPopup
+@onready var first_shot_tutorial: CanvasLayer = $FirstShotTutorial
 
 var _recall_tween: Tween = null
 
@@ -68,7 +70,15 @@ func _ready() -> void:
 	_stuck_timer.timeout.connect(_force_collect_balls)
 	add_child(_stuck_timer)
 	_load_level(GameManager.current_level)
-	_start_aiming()
+	# 튜토리얼 팝업 뒤로 조준·발사 입력이 전달되지 않도록 차단한다.
+	launcher.disable_aiming()
+	# 첫 등장 기믹이 있으면 튜토리얼을 표시한 후 게임을 시작한다.
+	var new_gimmicks: Array[String] = _detect_new_gimmicks()
+	if new_gimmicks.is_empty():
+		_start_aiming()
+	else:
+		tutorial_popup.all_tutorials_finished.connect(_start_aiming, CONNECT_ONE_SHOT)
+		tutorial_popup.show_tutorials(new_gimmicks)
 
 
 # 대기 중 실시간 경과를 추적하여 점진적 배속을 적용한다.
@@ -196,6 +206,32 @@ func _load_level(level: int) -> void:
 	launcher.set_launch_x(_first_ball_x)
 
 
+# 현재 레벨에서 처음 등장하는 기믹을 감지한다.
+func _detect_new_gimmicks() -> Array[String]:
+	var new_keys: Array[String] = []
+	# 삼각형 벽돌 체크
+	for brick in brick_container.get_children():
+		if brick.has_method("setup_triangle") and brick._is_triangle:
+			new_keys.append("tri")
+			break
+	# 미사일 아이템 체크
+	for brick in brick_container.get_children():
+		if brick.item == "missile":
+			new_keys.append("missile")
+			break
+	# 공 아이템 체크
+	if item_container.get_child_count() > 0:
+		new_keys.append("ball_item")
+	# 레이저 슈터 체크
+	if shooter_container.get_child_count() > 0:
+		new_keys.append("laser_shooter")
+	var unseen_keys: Array[String] = []
+	for key in new_keys:
+		if SaveManager.should_show_tutorial(key):
+			unseen_keys.append(key)
+	return unseen_keys
+
+
 # 조준 상태로 전환한다. 콤보를 리셋한다.
 func _start_aiming() -> void:
 	_state = State.AIMING
@@ -206,7 +242,16 @@ func _start_aiming() -> void:
 	_hide_landing_indicator()
 	_show_launch_indicator()
 	launcher.set_launch_x(_first_ball_x)
-	launcher.enable_aiming()
+	# 첫 턴 안내를 닫는 입력을 이어받아 같은 드래그로 조준한다.
+	if GameManager.turn_count == 0 and SaveManager.should_show_tutorial("first_shot"):
+		launcher.disable_aiming()
+		first_shot_tutorial.tutorial_dismissed.connect(func(touch_position: Vector2) -> void:
+			SaveManager.mark_tutorial_seen("first_shot")
+			launcher.begin_aiming_from(touch_position)
+		, CONNECT_ONE_SHOT)
+		first_shot_tutorial.show_tutorial()
+	else:
+		launcher.enable_aiming()
 
 
 # 조준 해제 시 발사 상태로 전환한다.

@@ -65,9 +65,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -155.0
-offset_top = -140.0
+offset_top = -170.0
 offset_right = 155.0
-offset_bottom = 140.0
+offset_bottom = 170.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = -4
@@ -137,6 +137,20 @@ max_value = 1.0
 step = 0.05
 value = 1.0
 
+[node name="RepeatTutorials" type="CheckButton" parent="Panel/BodyPanel/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 36)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.4, 0.4, 0.45, 1)
+text = "Repeat Tutorials"
+theme_override_colors/font_hover_color = Color(0.25, 0.25, 0.3, 1)
+theme_override_colors/font_pressed_color = Color(0.25, 0.25, 0.3, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.25, 0.25, 0.3, 1)
+theme_override_colors/font_focus_color = Color(0.25, 0.25, 0.3, 1)
+theme_override_colors/button_checked_color = Color(0.05, 0.65, 0.35, 1)
+theme_override_colors/button_unchecked_color = Color(0.45, 0.45, 0.5, 1)
+
 [node name="CloseButton" type="Button" parent="Panel/BodyPanel/VBoxContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
@@ -151,3 +165,4 @@ text = "Close"
 [connection signal="value_changed" from="Panel/BodyPanel/VBoxContainer/BGMSlider" to="." method="_on_bgm_slider_value_changed"]
 [connection signal="value_changed" from="Panel/BodyPanel/VBoxContainer/SFXSlider" to="." method="_on_sfx_slider_value_changed"]
 [connection signal="pressed" from="Panel/BodyPanel/VBoxContainer/CloseButton" to="." method="_on_close_pressed"]
+[connection signal="toggled" from="Panel/BodyPanel/VBoxContainer/RepeatTutorials" to="." method="_on_repeat_tutorials_toggled"]
