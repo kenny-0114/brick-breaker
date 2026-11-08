@@ -288,7 +288,8 @@ func _on_floor_body_entered(body: Node2D) -> void:
 	_update_landing_indicator()
 	# 공을 바닥 라인에서 수평 이동 후 제거
 	var tween := create_tween()
-	body.freeze = true
+	# 물리 콜백(body_entered) 안에서는 바디 모드를 바꿀 수 없으므로 프레임 끝으로 미룬다.
+	body.set_deferred("freeze", true)
 	tween.tween_property(body, "global_position", Vector2(_first_ball_x, FLOOR_Y), 0.15)
 	tween.tween_callback(body.queue_free)
 	# 모든 공이 회수되었는지 다음 프레임에서 확인
