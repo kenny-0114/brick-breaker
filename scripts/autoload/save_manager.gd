@@ -4,6 +4,8 @@
 extends Node
 
 const SAVE_PATH := "user://save_data.json"
+var _save_path := SAVE_PATH
+var _is_save_path_ready := false
 
 # 기본값
 var data := {
@@ -19,15 +21,42 @@ var data := {
 }
 
 
+# 첫 파일 접근 전에 실행 인자로 저장 경로를 확정한다.
 func _ready() -> void:
+	if not _configure_save_path():
+		get_tree().quit(2)
+		return
 	load_data()
+
+
+# 격리 경로를 검증하고 준비 실패 시 모든 파일 접근을 차단한다.
+func _configure_save_path() -> bool:
+	var has_override := false
+	for argument in OS.get_cmdline_user_args():
+		if not argument.begins_with("--save-path="):
+			continue
+		var candidate := argument.trim_prefix("--save-path=")
+		_save_path = ""
+		if has_override or not candidate.begins_with("user://p0/") or not candidate.ends_with(".json") or "\\" in candidate or ".." in candidate.split("/"):
+			push_error("SaveManager: 잘못된 테스트 저장 경로: %s" % candidate)
+			return false
+		has_override = true
+		_save_path = candidate
+	if has_override:
+		var err := DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://p0/"))
+		if err != OK:
+			_save_path = ""
+			push_error("SaveManager: 테스트 저장 디렉터리 생성 실패: %s" % error_string(err))
+			return false
+	_is_save_path_ready = true
+	return true
 
 
 # 파일에서 저장 데이터를 읽는다.
 func load_data() -> void:
-	if not FileAccess.file_exists(SAVE_PATH):
+	if not _is_save_path_ready or not FileAccess.file_exists(_save_path):
 		return
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var file := FileAccess.open(_save_path, FileAccess.READ)
 	if file == null:
 		push_error("SaveManager: Failed to open save file: %s" % error_string(FileAccess.get_open_error()))
 		return
@@ -43,7 +72,9 @@ func load_data() -> void:
 
 # 현재 데이터를 파일에 저장한다.
 func save_data() -> void:
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if not _is_save_path_ready:
+		return
+	var file := FileAccess.open(_save_path, FileAccess.WRITE)
 	if file == null:
 		push_error("SaveManager: Failed to write save file: %s" % error_string(FileAccess.get_open_error()))
 		return
