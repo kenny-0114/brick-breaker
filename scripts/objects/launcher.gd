@@ -122,8 +122,8 @@ func _update_aim(touch_pos: Vector2) -> void:
 	# 위쪽 방향만 허용 (y < 0)
 	if raw_dir.y >= 0:
 		raw_dir = Vector2(signf(raw_dir.x) if raw_dir.x != 0.0 else 1.0, -0.01).normalized()
-	# 각도 제한
-	var angle := raw_dir.angle_to(Vector2.UP)
+	# 각도 제한 — UP 기준으로 잰 각도여야 UP.rotated()로 같은 쪽 한계를 만들 수 있다.
+	var angle := Vector2.UP.angle_to(raw_dir)
 	if absf(angle) > MAX_AIM_ANGLE * 0.5:
 		var clamped := signf(angle) * MAX_AIM_ANGLE * 0.5
 		raw_dir = Vector2.UP.rotated(clamped)
