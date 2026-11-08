@@ -4,6 +4,8 @@
 extends RigidBody2D
 
 const MIN_ANGLE_RAD := deg_to_rad(8.0)
+# 수평에서 최소 기울기. 조준 한계(수평 위 5°)와 같아서 정상 발사 궤적은 바꾸지 않는다.
+const MIN_HORIZONTAL_ANGLE_RAD := deg_to_rad(5.0)
 const TRAIL_MIN := 12
 const TRAIL_MAX := 35
 
@@ -62,7 +64,9 @@ func _on_body_entered(body: Node) -> void:
 	_correct_velocity.call_deferred()
 
 
-# 수직에 가까운 상향 이동만 보정한다. 하향은 바닥 회수되므로 보정 불필요.
+# 무한 바운스를 만드는 극단적 각도를 보정한다.
+# - 수직에 가까운 상향: 천장과 바닥 사이를 같은 자리에서 오가지 않도록 옆으로 튼다.
+# - 수평에 가까운 이동: 좌우 벽 사이를 거의 내려오지 않고 왕복하지 않도록 위아래로 튼다.
 func _correct_velocity() -> void:
 	var vel := linear_velocity
 	var speed := vel.length()
@@ -71,9 +75,13 @@ func _correct_velocity() -> void:
 	var dir := vel / speed
 	var angle_from_up := absf(dir.angle_to(Vector2.UP))
 	if angle_from_up < MIN_ANGLE_RAD:
-		# 거의 수직 상향 → 최소 각도만큼 옆으로 틀어 무한 바운스를 방지
 		var sign_x: float = signf(dir.x) if dir.x != 0.0 else 1.0
 		dir = Vector2(sin(MIN_ANGLE_RAD) * sign_x, -cos(MIN_ANGLE_RAD))
+	elif absf(dir.y) < sin(MIN_HORIZONTAL_ANGLE_RAD):
+		# 완전 수평이면 바닥 쪽(아래)으로 틀어 회수를 앞당긴다.
+		var sign_x: float = signf(dir.x) if dir.x != 0.0 else 1.0
+		var sign_y: float = signf(dir.y) if dir.y != 0.0 else 1.0
+		dir = Vector2(cos(MIN_HORIZONTAL_ANGLE_RAD) * sign_x, sin(MIN_HORIZONTAL_ANGLE_RAD) * sign_y)
 	linear_velocity = dir * _target_speed
 
 
